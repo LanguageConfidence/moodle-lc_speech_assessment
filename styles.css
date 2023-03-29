@@ -1,0 +1,222 @@
+.que.lcspeech .audio-widget {
+    display: inline-flex;
+    margin: 2px 0;
+    width: 20em;
+    max-width: 100%;
+}
+.que.lcspeech .audio-widget .no-recording-placeholder {
+    flex-grow: 1;
+    padding-top: 0.45em;
+}
+.que.lcspeech .audio-widget .media-player {
+    flex-grow: 1;
+}
+.que.lcspeech .audio-widget .media-player audio {
+    height: 2.437em;
+    vertical-align: -0.8em;
+    width: 100%;
+    max-width: 100%;
+}
+.que.lcspeech .audio-widget .record-button {
+    margin-left: 4px;
+}
+.que.lcspeech .audio-widget button {
+    white-space: nowrap;
+    margin-right: 0;
+}
+.que.lcspeech .audio-widget a {
+    white-space: nowrap;
+    line-height: 2.437em;
+}
+.que.lcspeech .audio-widget .download-icon {
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+.que.lcspeech .audio-widget .download-icon {
+    vertical-align: middle;
+    margin-right: 2px;
+}
+
+.que.lcspeech .no-recording-placeholder {
+    color: #676463;
+    background-color: #f0f0f1;
+    text-align: center;
+}
+.que.lcspeech .download-icon {
+    height: 28px;
+    width: 28px;
+}
+
+body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=timelimitinseconds] .sr-only {
+    display: none;
+}
+
+.que.lcspeech .qtype_lcspeech_file {
+    margin-bottom: 3rem;
+    color: black;
+}
+
+.que.lcspeech .qtype_lcspeech_average_score {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.que.lcspeech .qtype_lcspeech_words {
+    margin-top: 1rem;
+}
+
+.que.lcspeech .qtype_lcspeech_word {
+    display: inline-block;
+    margin-right: 2rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 2px 2px 3px 3px #ccc;
+}
+
+.que.lcspeech .qtype_lcspeech_word_label {
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.que.lcspeech .qtype_lcspeech_phonemes {
+    display: flex;
+    flex-direction: row;
+}
+
+.que.lcspeech .qtype_lcspeech_phoneme {
+    margin-right: 1rem;
+}
+
+.que.lcspeech .qtype_lcspeech_phoneme:last-child {
+    margin-right: 0;
+}
+
+.que.lcspeech .qtype_lcspeech_phoneme_label {
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.que.lcspeech .qtype_lcspeech_phoneme_label_red {
+    background-color: red;
+}
+
+.que.lcspeech .qtype_lcspeech_phoneme_label_orange {
+    background-color: orange;
+}
+
+.que.lcspeech .qtype_lcspeech_phoneme_label_green {
+    background-color: green;
+}
+
+.que.lcspeech .qtype_lcspeech_phoneme_score {
+    text-align: center;
+}
+
+.custom-feedback-range label.col-form-label {
+    width: 100% !important;
+    display: inline-block;
+}
+
+.custom-feedback-range input, .custom-feedback-range span {
+    width: 100% !important;
+}
+
+.custom-feedback-range {
+    margin-bottom: 15px;
+}
+
+.form-group.fitem.custom-feedback-range {
+    width: 50%;
+    margin: 0 0 15px !important;
+    padding: 0 10px;
+}
+
+.custom-feedback-textarea {
+    width: calc(100% - 20px);
+    margin: 0 10px;
+}
+
+.custom-feedback-range + label.accesshide {
+    position: relative;
+    height: auto;
+    width: auto;
+    padding: 0 10px;
+}
+
+.correction-audio-select{
+    padding-bottom: 20px;
+}
+
+.custom-media .mediaplugin>div {
+    margin: 0 !important;
+}
+
+p.note
+{
+    background-color: #f0f7fb;
+    border-left: solid 4px #3498db;
+    line-height: 18px;
+    mc-auto-number-format: '{b}Note: {/b}';
+    overflow: hidden;
+    padding: 5px 12px;
+    font-size: 80% !important;
+    font-weight: 400 !important;
+}
+
+.cbtn {
+    width: 100%!important;
+    text-align: left!important;
+    position: relative!important;
+    padding: 5px 25px 5px 0!important;
+    color: #000000 !important;
+}
+
+.cbtn:after
+{
+    content: '' !important;
+    display: block !important;
+    position: absolute!important;
+    top: 10px!important;
+    right:10px!important;
+    width: 10px!important;
+    height: 10px!important;
+    border-left: 1px solid #000000;
+    border-bottom: 1px solid #000000;
+    transform: rotate(315deg);
+}
+
+.cbtn[aria-expanded="true"]:after
+{
+    transform: rotate(135deg);
+}
+
+.cbtn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.que .outcome {
+    background-color: #fcfcfc !important;
+    border-color: #fcfcfc !important;
+}
+
+.qtext p {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#id_score_feedback {
+    display: none;
+}
+
+#id_audio_upload {
+    display: none;
+}

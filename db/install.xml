@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/type/lcspeech/db" VERSION="2020010600" COMMENT="XMLDB file for Moodle question/type/lcspeech">
+  <TABLES>
+    <TABLE NAME="qtype_lcspeech_options" COMMENT="Options for LC Speech questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="mediatype" TYPE="char" LENGTH="8" NOTNULL="true" DEFAULT="audio" SEQUENCE="false"/>
+        <FIELD NAME="speechphrase" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="timelimitinseconds" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="30" SEQUENCE="false"/>
+        <FIELD NAME="accent" TYPE="char" LENGTH="2" NOTNULL="false" DEFAULT="us" SEQUENCE="false"/>
+        <FIELD NAME="speechtype" TYPE="char" LENGTH="12" NOTNULL="false" DEFAULT="scripted" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for Moodle question/type/lcspeech"/>
+        <KEY NAME="questionid" TYPE="foreign-unique" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_lcspeech_api_results" COMMENT="Responses from LC Speech API">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="sentence" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="format" TYPE="text" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="scoring" TYPE="text" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="payload_hash" TYPE="text" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="SHA256 hash of the full JSON payload sent to the Speech Assessment API"/>
+        <FIELD NAME="response_json" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON response received from Speech Assessment API"/>
+        <FIELD NAME="createdat" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Epoch time in seconds when this row was inserted"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_lcspeech_feedback" COMMENT="Options for LC Speech questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="from_range" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="to_range" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="feedback" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for Moodle question/type/lcspeech"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="qtype_lcspeech_audios" COMMENT="Options for LC Speech questions">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="language" TYPE="text" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="audio_file" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="unique_item_id" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for Moodle question/type/lcspeech"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
