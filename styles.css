@@ -212,3 +212,11 @@ p.note
     font-size: 18px;
     font-weight: bold;
 }
+
+#id_score_feedback {
+    display: none;
+}
+
+#id_audio_upload {
+    display: none;
+}

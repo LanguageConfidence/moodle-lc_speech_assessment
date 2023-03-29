@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Admin settings for the Speech Assessment question type.
  *

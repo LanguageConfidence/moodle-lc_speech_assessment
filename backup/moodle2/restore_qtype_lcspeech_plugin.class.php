@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Speech Assessment question type restore handler
  *
@@ -14,20 +15,23 @@ defined('MOODLE_INTERNAL') || die();
  * @package   qtype_lcspeech
  * @copyright 2023 Speech Assessment
  */
-class restore_qtype_lcspeech_plugin extends restore_qtype_plugin {
+class restore_qtype_lcspeech_plugin extends restore_qtype_plugin
+{
     /**
      * Returns the qtype name.
      *
      * @return string The type name
      */
-    protected static function qtype_name() {
+    protected static function qtype_name()
+    {
         return 'lcspeech';
     }
 
     /**
      * Returns the paths to be handled by the plugin at question level
      */
-    protected function define_question_plugin_structure() {
+    protected function define_question_plugin_structure()
+    {
 
         $paths = array();
 
@@ -45,7 +49,8 @@ class restore_qtype_lcspeech_plugin extends restore_qtype_plugin {
      *
      * @param array $data
      */
-    public function process_lcspeech($data) {
+    public function process_lcspeech($data)
+    {
         global $DB;
 
         $data = (object)$data;

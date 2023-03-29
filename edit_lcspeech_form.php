@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines the editing form for LC Speech Assessment questions.
  *
@@ -18,61 +19,86 @@ require_once($CFG->dirroot . '/question/type/edit_question_form.php');
  *
  * @copyright 2021 LC Speech Assessment
  */
-class qtype_lcspeech_edit_form extends question_edit_form {
+class qtype_lcspeech_edit_form extends question_edit_form
+{
 
-    protected function definition_inner($mform) {
+    protected function definition_inner($mform)
+    {
         // Field for speech_assessment_type
         $attributes =  array('onchange' => 'var value = document.getElementById("id_speechtype").value; console.log("fitem_id_speechphrase value: " + value); if (value == "unscripted") { document.getElementById("id_speechphrase").value = "empty"; document.getElementById("fitem_id_speechphrase").style.display = "none"; document.getElementById("fitem_id_idnumber").style.display = "none"; } else { document.getElementById("id_speechphrase").value = ""; document.getElementById("fitem_id_speechphrase").style.display = ""; document.getElementById("fitem_id_idnumber").style.display = ""; }');
-        $mform->addElement('select', 'speechtype', get_string('speechtype', 'qtype_lcspeech'), 
-            ['scripted'=>'Scripted', 'unscripted'=>'Unscripted'], $attributes);
+        $mform->addElement(
+            'select',
+            'speechtype',
+            get_string('speechtype', 'qtype_lcspeech'),
+            ['scripted' => 'Scripted', 'unscripted' => 'Unscripted'],
+            $attributes
+        );
         $mform->setDefault('speechtype', qtype_lcspeech::DEFAULT_SPEECH_ASSESSMENT);
 
         // Field for speechphrase.
-        $mform->addElement('text', 'speechphrase', get_string('speechphrase', 'qtype_lcspeech'),
-                array('maxlength' => 1000, 'size' => 100));
+        $mform->addElement(
+            'text',
+            'speechphrase',
+            get_string('speechphrase', 'qtype_lcspeech'),
+            array('maxlength' => 1000, 'size' => 100)
+        );
         $mform->addHelpButton('speechphrase', 'speechphrase', 'qtype_lcspeech');
         $mform->addRule('speechphrase', null, 'required', null, 'client');
         $mform->setType('speechphrase', PARAM_TEXT);
 
         // Field for timelimitinseconds.
-        $mform->addElement('duration', 'timelimitinseconds', get_string('timelimit', 'qtype_lcspeech'),
-                ['units' => [60, 1], 'optional' => false]);
+        $mform->addElement(
+            'duration',
+            'timelimitinseconds',
+            get_string('timelimit', 'qtype_lcspeech'),
+            ['units' => [60, 1], 'optional' => false]
+        );
         $mform->addHelpButton('timelimitinseconds', 'timelimit', 'qtype_lcspeech');
         $mform->setDefault('timelimitinseconds', qtype_lcspeech::DEFAULT_TIMELIMIT);
 
         // Field for accent
-        $mform->addElement('select', 'accent', get_string('accent', 'qtype_lcspeech'), ['us'=>'American (US)', 'uk'=>'British (UK)']);
+        $mform->addElement('select', 'accent', get_string('accent', 'qtype_lcspeech'), ['us' => 'American (US)', 'uk' => 'British (UK)']);
         $mform->setDefault('accent', qtype_lcspeech::DEFAULT_ACCENT);
 
+
+        $this::hideFeedbackAndAudio($mform);
+        // process case Edit
+        // $mform->disabledIf('speechphrase', 'speechtype', 'eq', 'unscripted');
+        // $mform->hideIf('speechphrase', 'speechtype', 'eq', 'unscripted');
+        // $mform->hideIf('idnumber', 'speechtype', 'eq', 'unscripted');
+    }
+
+    protected function hideFeedbackAndAudio($mform)
+    {
         // add Feedback
         $mform->addElement('header', 'score_feedback', 'Feedback');
         $fromRange = array(0, 31, 51, 81);
         $toRange = array(30, 50, 80, 100);
-        for($i=0;$i<4;$i++) {
-            $availableFirstGroup=array();
-            $availableFirstGroup[] =& $mform->createElement('text', "from_range[{$i}]", 'From', 'placeholder="set from range" disabled="true" class="custom-feedback-range"');
-            $availableFirstGroup[] =& $mform->createElement('text', "to_range[{$i}]", 'To', 'placeholder="set to range" disabled="true" class="custom-feedback-range"');
-            $availableFirstGroup[] =& $mform->createElement('textarea', "feedback[{$i}]", 'Feedback', 'wrap="virtual" rows="5" cols="50" class="custom-feedback-textarea"');
+        for ($i = 0; $i < 4; $i++) {
+            $availableFirstGroup = array();
+            $availableFirstGroup[] = &$mform->createElement('text', "from_range[{$i}]", 'From', 'placeholder="set from range" disabled="true" class="custom-feedback-range"');
+            $availableFirstGroup[] = &$mform->createElement('text', "to_range[{$i}]", 'To', 'placeholder="set to range" disabled="true" class="custom-feedback-range"');
+            $availableFirstGroup[] = &$mform->createElement('textarea', "feedback[{$i}]", 'Feedback', 'wrap="virtual" rows="5" cols="50" class="custom-feedback-textarea"');
             $mform->setType("from_range[{$i}]", PARAM_INT);
             $mform->setType("to_range[{$i}]", PARAM_INT);
             $mform->setDefault("from_range[{$i}]", $fromRange[$i]);
             $mform->setDefault("to_range[{$i}]", $toRange[$i]);
-            $mform->addGroup($availableFirstGroup, 'available_group_{$i}', $i===0?'Grade Range':'', '', false);
+            $mform->addGroup($availableFirstGroup, 'available_group_{$i}', $i === 0 ? 'Grade Range' : '', '', false);
         }
 
         $mform->setExpanded('score_feedback');
 
         $mform->addElement('header', 'audio_upload', 'Correction Audio');
         $repeatarray = array();
-        $repeatno=0;
-        if(!empty($this->question->options->audios)) {
-            $repeatno=count($this->question->options->audios);
+        $repeatno = 0;
+        if (!empty($this->question->options->audios)) {
+            $repeatno = count($this->question->options->audios);
         }
 
         $uploadGroup = [];
-        $uploadGroup[] = &$mform->createElement('select', 'language', 'Language', ['en-US'=>'American', 'en-AU'=>'Australian', 'en-UK'=>'British'], 'class="correction-audio-select"');
-        $uploadGroup[] = &$mform->createElement('filepicker', 'correction_audio', 'Audio', null, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1, 'accepted_types'=>array('.mp3', '.wav', '.ogg')));
-        $uploadGroup[] = & $mform->createElement('submit', 'removeaudio', 'Remove');
+        $uploadGroup[] = &$mform->createElement('select', 'language', 'Language', ['en-US' => 'American', 'en-AU' => 'Australian', 'en-UK' => 'British'], 'class="correction-audio-select"');
+        $uploadGroup[] = &$mform->createElement('filepicker', 'correction_audio', 'Audio', null, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1, 'accepted_types' => array('.mp3', '.wav', '.ogg')));
+        $uploadGroup[] = &$mform->createElement('submit', 'removeaudio', 'Remove');
         $mform->registerNoSubmitButton('removeaudio');
         $repeatarray[] = $mform->createElement('group', 'audio_upload_group', '', $uploadGroup, null, false);
 
@@ -80,15 +106,10 @@ class qtype_lcspeech_edit_form extends question_edit_form {
 
         $this->repeat_elements($repeatarray, $repeatno, $repeateloptions, 'audio_correction_repeats', 'audio_correction_fields', 1, null, true, "removeaudio");
         $mform->setExpanded('audio_upload');
-
-
-        // process case Edit
-        // $mform->disabledIf('speechphrase', 'speechtype', 'eq', 'unscripted');
-        // $mform->hideIf('speechphrase', 'speechtype', 'eq', 'unscripted');
-        // $mform->hideIf('idnumber', 'speechtype', 'eq', 'unscripted');
     }
 
-    public function validation($data, $files) {
+    public function validation($data, $files)
+    {
         $errors = parent::validation($data, $files);
 
         // Validate placeholders in the question text.
@@ -111,20 +132,25 @@ class qtype_lcspeech_edit_form extends question_edit_form {
         if ($data['timelimitinseconds'] <= 0) {
             $errors['timelimitinseconds'] = get_string('err_timelimitpositive', 'qtype_lcspeech');
         } else if ($data['timelimitinseconds'] > $maxtimelimit) {
-            $errors['timelimitinseconds'] = get_string('err_timelimit', 'qtype_lcspeech',
-                    format_time($maxtimelimit));
+            $errors['timelimitinseconds'] = get_string(
+                'err_timelimit',
+                'qtype_lcspeech',
+                format_time($maxtimelimit)
+            );
         }
 
         return $errors;
     }
 
-    public function qtype() {
+    public function qtype()
+    {
         return 'lcspeech';
     }
 
 
-    protected function data_preprocessing($question) {
-        if(isset($question->options->range)) {
+    protected function data_preprocessing($question)
+    {
+        if (isset($question->options->range)) {
             $feedback = [];
             foreach ($question->options->range as $range) {
                 $feedback[] = $range->feedback;
@@ -132,21 +158,25 @@ class qtype_lcspeech_edit_form extends question_edit_form {
             $question->feedback = $feedback;
         }
 
-        if(isset($question->options->audios)) {
-             $i = 0;
-             foreach ($question->options->audios as $audio) {
-                 $draftitemid = file_get_submitted_draft_itemid('correction_audio{$i}');
+        if (isset($question->options->audios)) {
+            $i = 0;
+            foreach ($question->options->audios as $audio) {
+                $draftitemid = file_get_submitted_draft_itemid('correction_audio{$i}');
 
 
-                 file_prepare_draft_area($draftitemid, $this->context->id, 'qtype_lcspeech',
-                     'correction_audio', $audio->unique_item_id?(int)$audio->unique_item_id:null,
-                     array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => -1));
+                file_prepare_draft_area(
+                    $draftitemid,
+                    $this->context->id,
+                    'qtype_lcspeech',
+                    'correction_audio',
+                    $audio->unique_item_id ? (int)$audio->unique_item_id : null,
+                    array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => -1)
+                );
 
-                 $question->correction_audio[$i] = $draftitemid;
-                 $question->language[$i] = $audio->language;
-                 $i++;
-             }
-
+                $question->correction_audio[$i] = $draftitemid;
+                $question->language[$i] = $audio->language;
+                $i++;
+            }
         }
 
         return $question;

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Standard Moodle hooks for the Speech Assessment question type.
  *
@@ -21,14 +22,16 @@ defined('MOODLE_INTERNAL') || die();
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  */
-function qtype_lcspeech_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
+function qtype_lcspeech_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = [])
+{
     global $CFG;
     require_once($CFG->libdir . '/questionlib.php');
     question_pluginfile($course, $context, 'qtype_lcspeech', $filearea, $args, $forcedownload, $options);
 }
 
 
-function qtype_lcspeech_ensure_api_config_is_set() {
+function qtype_lcspeech_ensure_api_config_is_set()
+{
     global $CFG;
 
     if (empty($CFG->lcspeech_apikey)) {

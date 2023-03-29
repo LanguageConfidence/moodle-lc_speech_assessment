@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Question type class for the Speech Assessment question type.
  *
@@ -18,7 +19,8 @@ require_once($CFG->dirroot . '/question/type/lcspeech/question.php');
  *
  * @copyright 2023 Speech Assessment
  */
-class qtype_lcspeech extends question_type {
+class qtype_lcspeech extends question_type
+{
 
     /** @var int default recording time limit in seconds. */
     const DEFAULT_TIMELIMIT = 30;
@@ -35,15 +37,18 @@ class qtype_lcspeech extends question_type {
     /** @var string default accent. */
     const DEFAULT_SPEECH_ASSESSMENT = 'scripted';
 
-    public function response_file_areas() {
+    public function response_file_areas()
+    {
         return ['recording'];
     }
 
-    public function extra_question_fields() {
+    public function extra_question_fields()
+    {
         return array('qtype_lcspeech_options', 'mediatype', 'speechphrase', 'timelimitinseconds', 'accent', 'speechtype');
     }
 
-    protected function initialise_question_instance(question_definition $question, $questiondata) {
+    protected function initialise_question_instance(question_definition $question, $questiondata)
+    {
         $mediatype = $questiondata->options->mediatype;
         parent::initialise_question_instance($question, $questiondata);
         $question->speechphrase = $questiondata->options->speechphrase;
@@ -52,8 +57,8 @@ class qtype_lcspeech extends question_type {
         $question->accent = $questiondata->options->accent;
         $question->speechtype = $questiondata->options->speechtype;
         $question->widgetplaceholders = $this->get_widget_placeholders($questiondata->questiontext);
-        $question->feedbackRange = $questiondata->options->range??null;
-        $question->correctionAudios = $questiondata->options->audios??null;
+        $question->feedbackRange = $questiondata->options->range ?? null;
+        $question->correctionAudios = $questiondata->options->audios ?? null;
         if (empty($question->widgetplaceholders)) {
             // There was no recorder in the question text. Add one placeholder to the question text with the title 'recording'.
             $question->questiontext .= html_writer::div('[[recording:' . $mediatype . ']]');
@@ -64,22 +69,24 @@ class qtype_lcspeech extends question_type {
         }
     }
 
-    public function export_to_xml($question, qformat_xml $format, $extra = null) {
+    public function export_to_xml($question, qformat_xml $format, $extra = null)
+    {
         $output = '';
         $output .= '    <mediatype>' . $question->options->mediatype .
-                "</mediatype>\n";
+            "</mediatype>\n";
         $output .= '    <speechphrase>' . $question->options->speechphrase .
-                "</speechphrase>\n";
+            "</speechphrase>\n";
         $output .= '    <accent>' . $question->options->accent .
-                "</accent>\n";
+            "</accent>\n";
         $output .= '    <timelimitinseconds>' . $question->options->timelimitinseconds .
-                "</timelimitinseconds>\n";
+            "</timelimitinseconds>\n";
         $output .= '    <speechtype>' . $question->options->speechtype .
-                "</speechtype>\n";
+            "</speechtype>\n";
         return $output;
     }
 
-    public function import_from_xml($data, $question, qformat_xml $format, $extra=null) {
+    public function import_from_xml($data, $question, qformat_xml $format, $extra = null)
+    {
         $questiontype = $data['@']['type'];
         if ($questiontype != $this->name()) {
             return false;
@@ -90,8 +97,11 @@ class qtype_lcspeech extends question_type {
 
         $qo->mediatype = $format->getpath($data, array('#', 'mediatype', 0, '#'), self::MEDIA_TYPE_AUDIO);
         $qo->speechphrase = $format->getpath($data, array('#', 'speechphrase', 0, '#'), false, true, 'speechphrase is a required field for Speech Assessment question definitions');
-        $qo->timelimitinseconds = $format->getpath($data, array('#', 'timelimitinseconds', 0, '#'),
-                get_config('timelimit', 'qtype_lcspeech'));
+        $qo->timelimitinseconds = $format->getpath(
+            $data,
+            array('#', 'timelimitinseconds', 0, '#'),
+            get_config('timelimit', 'qtype_lcspeech')
+        );
         $qo->accent = $format->getpath($data, array('#', 'accent', 0, '#'), self::DEFAULT_ACCENT);
 
         return $qo;
@@ -106,7 +116,8 @@ class qtype_lcspeech extends question_type {
      * @return string|null
      * @throws coding_exception
      */
-    public function validate_widget_placeholders($qtext, $mediatype) {
+    public function validate_widget_placeholders($qtext, $mediatype)
+    {
 
         // The placeholder format.
         $a = new \stdClass();
@@ -135,8 +146,11 @@ class qtype_lcspeech extends question_type {
 
         // If medatype is audio, custom placeholer is not allowed.
         if ($mediatype === self::MEDIA_TYPE_AUDIO && $matches[2]) {
-            return get_string('err_placeholdernotallowed', 'qtype_lcspeech',
-                get_string($mediatype, 'qtype_lcspeech'));
+            return get_string(
+                'err_placeholdernotallowed',
+                'qtype_lcspeech',
+                get_string($mediatype, 'qtype_lcspeech')
+            );
         }
 
         if ($matches) {
@@ -187,7 +201,8 @@ class qtype_lcspeech extends question_type {
      * @param $questiontext
      * @return array placeholder => filename
      */
-    public function get_widget_placeholders($questiontext) {
+    public function get_widget_placeholders($questiontext)
+    {
         preg_match_all('/\[\[([a-z0-9_-]+):(audio)]]/i', $questiontext, $matches, PREG_SET_ORDER);
 
         $widgetplaceholders = [];
@@ -204,12 +219,14 @@ class qtype_lcspeech extends question_type {
      * @param string $mediatype 'audio'
      * @return string the file name that should be used.
      */
-    public static function get_media_filename(string $filename, string $mediatype) {
+    public static function get_media_filename(string $filename, string $mediatype)
+    {
         return $filename . '.wav';
     }
 
 
-    public function save_question_options($question) {
+    public function save_question_options($question)
+    {
         global $DB;
         $extraquestionfields = $this->extra_question_fields();
 
@@ -218,8 +235,10 @@ class qtype_lcspeech extends question_type {
 
             $function = 'update_record';
             $questionidcolname = $this->questionid_column_name();
-            $options = $DB->get_record($question_extension_table,
-                array($questionidcolname => $question->id));
+            $options = $DB->get_record(
+                $question_extension_table,
+                array($questionidcolname => $question->id)
+            );
             if (!$options) {
                 $function = 'insert_record';
                 $options = new stdClass();
@@ -235,19 +254,18 @@ class qtype_lcspeech extends question_type {
         }
 
         $this->saveOtherTableDetails($DB, $question);
-
     }
 
 
 
     public function saveOtherTableDetails($db, $question)
     {
-//        $itemId = file_get_submitted_draft_itemid('correction_audio');
-//        $context = $this->get_context_by_category_id($question->category);
+        //        $itemId = file_get_submitted_draft_itemid('correction_audio');
+        //        $context = $this->get_context_by_category_id($question->category);
         $function = 'update_record';
         $questionidcolname = $this->questionid_column_name();
-        for($i=0;$i<4;$i++) {
-            $options = $db->get_record('qtype_lcspeech_feedback', array($questionidcolname => $question->id, 'from_range'=>$question->from_range[$i], 'to_range'=>$question->to_range[$i]));
+        for ($i = 0; $i < 4; $i++) {
+            $options = $db->get_record('qtype_lcspeech_feedback', array($questionidcolname => $question->id, 'from_range' => $question->from_range[$i], 'to_range' => $question->to_range[$i]));
             if (!$options) {
                 $function = 'insert_record';
                 $options = new stdClass();
@@ -255,22 +273,22 @@ class qtype_lcspeech extends question_type {
             }
             $options->from_range = $question->from_range[$i];
             $options->to_range = $question->to_range[$i];
-            $options->feedback = isset($question->feedback[$i])?$question->feedback[$i]:'';
+            $options->feedback = isset($question->feedback[$i]) ? $question->feedback[$i] : '';
             $db->{$function}('qtype_lcspeech_feedback', $options);
         }
         $componentname = 'qtype_lcspeech';
         $optionsAudios = $db->get_records('qtype_lcspeech_audios', array($questionidcolname => $question->id));
-        if(!empty($optionsAudios)) {
+        if (!empty($optionsAudios)) {
             $db->delete_records('qtype_lcspeech_audios', array($questionidcolname => $question->id));
         }
 
-        if(isset($question->correction_audio) && !empty($question->correction_audio)) {
-            $i=0;
+        if (isset($question->correction_audio) && !empty($question->correction_audio)) {
+            $i = 0;
             foreach ($question->correction_audio as $audio) {
                 file_save_draft_area_files($audio, $question->context->id, $componentname, 'correction_audio', (int)$audio, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1));
                 $fs = get_file_storage();
-                $files = $fs->get_area_files($question->context->id, 'qtype_lcspeech','correction_audio', (int)$audio, '', false);
-                if(empty($files)) {
+                $files = $fs->get_area_files($question->context->id, 'qtype_lcspeech', 'correction_audio', (int)$audio, '', false);
+                if (empty($files)) {
                     continue;
                 }
                 $file = reset($files);
@@ -285,7 +303,8 @@ class qtype_lcspeech extends question_type {
         }
     }
 
-    public function get_question_options($question) {
+    public function get_question_options($question)
+    {
         global $CFG, $DB, $OUTPUT;
 
         if (!isset($question->options)) {
@@ -294,9 +313,11 @@ class qtype_lcspeech extends question_type {
         $extraquestionfields = $this->extra_question_fields();
         if (is_array($extraquestionfields)) {
             $question_extension_table = array_shift($extraquestionfields);
-            $extra_data = $DB->get_record($question_extension_table,
+            $extra_data = $DB->get_record(
+                $question_extension_table,
                 array($this->questionid_column_name() => $question->id),
-                implode(', ', $extraquestionfields));
+                implode(', ', $extraquestionfields)
+            );
             if ($extra_data) {
                 foreach ($extraquestionfields as $field) {
                     $question->options->$field = $extra_data->$field;
@@ -311,6 +332,4 @@ class qtype_lcspeech extends question_type {
         $question->options->audios = $DB->get_records('qtype_lcspeech_audios', array('questionid' => $question->id), 'id ASC');
         return true;
     }
-
-
 }

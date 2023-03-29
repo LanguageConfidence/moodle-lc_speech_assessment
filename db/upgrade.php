@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Speech Assessment question type db upgrade script
  *
@@ -15,7 +16,8 @@ require_once($CFG->dirroot . '/question/type/lcspeech/lib.php');
  * @param int $oldversion the version we are upgrading from.
  * @return bool
  */
-function xmldb_qtype_lcspeech_upgrade($oldversion) {
+function xmldb_qtype_lcspeech_upgrade($oldversion)
+{
     global $DB;
 
     qtype_lcspeech_ensure_api_config_is_set();
@@ -49,7 +51,7 @@ function xmldb_qtype_lcspeech_upgrade($oldversion) {
         $feedBackTable->add_key('foreignkey1', XMLDB_KEY_FOREIGN, array('questionid'), 'question', array('id'));
 
 
-        if(!$dbman->table_exists($feedBackTable)) {
+        if (!$dbman->table_exists($feedBackTable)) {
             $feedBackTable->addField($feedBackId);
             $feedBackTable->addField($feedBackQuestionId);
             $feedBackTable->addField($feedBackFrom);
@@ -62,13 +64,13 @@ function xmldb_qtype_lcspeech_upgrade($oldversion) {
         $correctionAudioTable =  new xmldb_table('qtype_lcspeech_audios');
         $correctionAudioId = new xmldb_field('id', XMLDB_TYPE_INTEGER, '10', XMLDB_UNSIGNED, XMLDB_NOTNULL, XMLDB_SEQUENCE, null, null, null);
         $correctionAudioQuestionId = new xmldb_field('questionid', XMLDB_TYPE_INTEGER, 10, XMLDB_UNSIGNED, XMLDB_NOTNULL, null, null, null, null);
-        $correctionAudioLanguage = new xmldb_field('language', XMLDB_TYPE_TEXT, '20', null, true, null, null );
+        $correctionAudioLanguage = new xmldb_field('language', XMLDB_TYPE_TEXT, '20', null, true, null, null);
         $correctionAudioFile = new xmldb_field('audio_file', XMLDB_TYPE_TEXT, 'medium', null, null, null, null);
 
         $correctionAudioTable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'), null, null);
         $correctionAudioTable->add_key('foreignkey1', XMLDB_KEY_FOREIGN, array('questionid'), 'question', array('id'));
 
-        if(!$dbman->table_exists($correctionAudioTable)) {
+        if (!$dbman->table_exists($correctionAudioTable)) {
             $correctionAudioTable->addField($correctionAudioId);
             $correctionAudioTable->addField($correctionAudioQuestionId);
             $correctionAudioTable->addField($correctionAudioLanguage);

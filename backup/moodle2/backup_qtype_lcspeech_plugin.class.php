@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Speech Assessment question type backup handler
  *
@@ -13,12 +14,14 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @copyright 2023 Speech Assessment
  */
-class backup_qtype_lcspeech_plugin extends backup_qtype_plugin {
+class backup_qtype_lcspeech_plugin extends backup_qtype_plugin
+{
 
     /**
      * Returns the qtype information to attach to question element
      */
-    protected function define_question_plugin_structure() {
+    protected function define_question_plugin_structure()
+    {
 
         // Define the virtual plugin element with the condition to fulfill.
         $plugin = $this->get_plugin_element(null, '../../qtype', 'lcspeech');
@@ -31,14 +34,17 @@ class backup_qtype_lcspeech_plugin extends backup_qtype_plugin {
 
         // Now create the qtype own structures.
         $lcspeech = new backup_nested_element('lcspeech', array('id'), array(
-            'mediatype', 'speechphrase', 'timelimitinseconds', 'accent'));
+            'mediatype', 'speechphrase', 'timelimitinseconds', 'accent', 'speechtype'
+        ));
 
         // Now the own qtype tree.
         $pluginwrapper->add_child($lcspeech);
 
         // Set source to populate the data.
-        $lcspeech->set_source_table('qtype_lcspeech_options',
-            array('questionid' => backup::VAR_PARENTID));
+        $lcspeech->set_source_table(
+            'qtype_lcspeech_options',
+            array('questionid' => backup::VAR_PARENTID)
+        );
 
         // Don't need to annotate ids nor files.
 

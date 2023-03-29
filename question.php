@@ -161,7 +161,7 @@ class qtype_lcspeech_question extends question_graded_automatically
                 "audio_base64" => base64_encode($audio)
             );
         }
-        
+
 
         $payload_keys = array_keys($payload);
         sort($payload_keys);
@@ -218,9 +218,9 @@ class qtype_lcspeech_question extends question_graded_automatically
         } else {
             $url = get_config('qtype_lcspeech', 'api_unscripted_url');
         }
-        
-        $endpoint = "{$url}/{$this->accent}";
 
+        $endpoint = "{$url}/{$this->accent}";
+        // var_dump($endpoint);
         $header = array(
             'Content-Type: application/json',
             'x-blobr-key: ' . $api_key,
@@ -228,7 +228,7 @@ class qtype_lcspeech_question extends question_graded_automatically
         );
 
         $postdata = json_encode($payload);
-
+        // var_dump($postdata);
         $ch = curl_init($endpoint);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
@@ -237,9 +237,9 @@ class qtype_lcspeech_question extends question_graded_automatically
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         $result_raw = curl_exec($ch);
         curl_close($ch);
-
+        // var_dump($result_raw);
         $result = json_decode($result_raw, true);
-        
+        // exit;
         if (array_key_exists('overall', $result)) {
             return array(
                 'success' => true,

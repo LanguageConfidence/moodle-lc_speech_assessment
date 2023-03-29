@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Privacy provider for the Speech Assessment question type.
  *
@@ -17,9 +18,11 @@ use core_privacy\local\request\writer;
 /**
  * Privacy provider for the Speech Assessment question type.
  */
-class provider implements \core_privacy\local\metadata\null_provider {
+class provider implements \core_privacy\local\metadata\null_provider
+{
 
-    public static function get_reason() : string {
+    public static function get_reason(): string
+    {
         return 'privacy:metadata';
     }
 }
