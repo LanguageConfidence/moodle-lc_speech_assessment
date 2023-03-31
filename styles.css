@@ -220,3 +220,13 @@ p.note
 #id_audio_upload {
     display: none;
 }
+
+.fb-main {
+    border-left: 3px #0fa1bfe3 solid;
+    padding-left: 5px;
+}
+
+.fb-title-container {
+    border-bottom: 1px solid #00000040;
+    margin-bottom: 10px;
+}

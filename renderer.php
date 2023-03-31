@@ -330,6 +330,9 @@ class qtype_lcspeech_renderer extends qtype_renderer
                                       </div>
                                     
                                     </div></div>';
+
+                $fluencyFeedback = $this->feedbackResponse($result);
+                $all_feedback .= $fluencyFeedback;
             }
             return $question->format_text($all_feedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
         }
@@ -424,18 +427,62 @@ class qtype_lcspeech_renderer extends qtype_renderer
                                       </div>
                                     
                                     </div></div>';
+
+                $fluencyFeedback = $this->feedbackResponse($result);
+                $all_feedback .= $fluencyFeedback;
             }
+
             return $question->format_text($all_feedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
         }
         return '';
+    }
+
+    protected function feedbackResponse($response)
+    {
+        $content = '
+            <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
+                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Speech Rate</span><span style="float: right;">'  . $response['fluency']['metrics']['speech_rate'] . '</span></div>
+                <div><span style="font-weight: bold">Feedback</span></div>
+                <div>' . $response['fluency']['feedback']['speech_rate']['feedback_text'] . '</div>
+            </div>
+            <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
+                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of pauses</span><span style="float: right;"></span></div>
+                <div><span style="font-weight: bold">Feedback</span></div>
+                <div>&nbsp;&nbsp;</div>
+            </div>
+            <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
+                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Length of run</span><span style="float: right;"></span></div>
+                <div><span style="font-weight: bold">Feedback</span></div>
+                <div>&nbsp;&nbsp;</div>
+            </div>
+        ';
+
+        $feedback = '';
+
+        $feedback .= '<div id="accordionFeedback">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseFeedbackOne" aria-expanded="false" aria-controls="collapseFeedbackOne">
+                                        Fluency feedback
+                                    </button>
+                                </h5>
+                            </div>
+                                            
+                            <div id="collapseFeedbackOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionFeedback">
+                                <div class="card-body">
+                                    <div class="qtype_lcspeech_words">' . $content . '</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>';
+        return $feedback;
     }
 
     public function feedback(question_attempt $qa, question_display_options $options)
     {
         $output = '';
         $hint = null;
-
-
 
         if ($options->feedback) {
             $output .= html_writer::nonempty_tag(

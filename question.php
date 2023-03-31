@@ -239,6 +239,7 @@ class qtype_lcspeech_question extends question_graded_automatically
         curl_close($ch);
         // var_dump($result_raw);
         $result = json_decode($result_raw, true);
+        // var_dump($result);
         // exit;
         if (array_key_exists('overall', $result)) {
             return array(
