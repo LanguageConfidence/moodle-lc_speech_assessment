@@ -62,8 +62,7 @@ class restore_qtype_lcspeech_plugin extends restore_qtype_plugin
         $newquestionid   = $this->get_new_parentid('question');
 
         // If the question has been created by restore,
-        // we need to create a "qtype_lcspeech_options" record
-        // and create a mapping from the $oldid to the $newid.
+        // we need to create a "qtype_lcspeech_options" record and create a mapping from the $oldid to the $newid.
         if ($this->get_mappingid('question_created', $oldquestionid)) {
             $data->questionid = $newquestionid;
             $newid = $DB->insert_record('qtype_lcspeech_options', $data);
