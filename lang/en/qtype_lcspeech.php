@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Strings for component 'qtype_lcspeech', language 'en', branch 'MOODLE_38_STABLE'
  *
@@ -73,16 +74,16 @@ $string['uploadprogress'] = 'Uploading ({$a})';
 $string['speechphrase'] = 'Speech phrase';
 $string['speechphrase_help'] = 'This is the phrase that you expect the student to say out loud and will be assessed against.';
 $string['err_speechphraseempty'] = 'Speech phrase is required';
-$string['note']="Click the 'Record your answer' button above to start recording, pause for a moment and then start speaking. Once you have finished your attempt, click the 'Submit and finish' button below.";
-$string['other_settings_heading']='Other Settings';
-$string['speech_assessment_scripted_settings_heading']='Speech assessment scripted Settings';
-$string['speech_assessment_unscripted_settings_heading']='Speech assessment unscripted Settings';
-$string['company_id']='Company Id';
-$string['api_url']='API URL';
+$string['note'] = "Click the 'Record your answer' button above to start recording, pause for a moment and then start speaking. Once you have finished your attempt, click the 'Submit and finish' button below.";
+$string['other_settings_heading'] = 'Other Settings';
+$string['speech_assessment_scripted_settings_heading'] = 'Speech assessment scripted Settings';
+$string['speech_assessment_unscripted_settings_heading'] = 'Speech assessment unscripted Settings';
+$string['company_id'] = 'Company Id';
+$string['api_url'] = 'API URL';
 $string['accent'] = 'Accent';
 $string['taskremoveoldfiles'] = 'Remove Old recordings';
 $string['daysolderaudiofiles'] = 'Number Of Days';
 $string['daysolderaudiofiles_desc'] = 'Specify how many days older files need to be deleted';
-$string['api_scripted_url']='API URL';
-$string['api_unscripted_url']='API URL';
-$string['speechtype']='Speech assessment type';
+$string['api_scripted_url'] = 'API URL';
+$string['api_unscripted_url'] = 'API URL';
+$string['speechtype'] = 'Speech assessment type';

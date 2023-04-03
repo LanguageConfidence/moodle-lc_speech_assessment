@@ -24,7 +24,7 @@ if ($ADMIN->fulltree) {
         'qtype_lcspeech/timelimit',
         get_string('timelimit', 'qtype_lcspeech'),
         get_string('timelimit_desc', 'qtype_lcspeech'),
-        600,
+        60,
         60
     ));
 

@@ -53,7 +53,7 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
 }
 
 .que.lcspeech .qtype_lcspeech_file {
-    margin-bottom: 3rem;
+    /* margin-bottom: 3rem; */
     color: black;
 }
 

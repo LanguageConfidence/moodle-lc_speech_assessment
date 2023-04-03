@@ -221,6 +221,50 @@ class qtype_lcspeech_renderer extends qtype_renderer
             </span>';
     }
 
+
+    protected function build_pronunciation_feedback($result)
+    {
+        $feedback = '';
+
+        $words = array_filter(array_map(function ($word) {
+            return array(
+                'label' => $word['word_text'],
+                'mean' => $word['word_score'],
+                'phones' => array_filter($word['phonemes'], function ($phoneme) {
+                    return $phoneme['ipa_label'] !== 'SIL';
+                }),
+            );
+        }, $result['pronunciation']['words']), function ($word) {
+            return count($word['phones']) > 0;
+        });
+        foreach ($words as $word) {
+            $word_feedback = '';
+            foreach ($word['phones'] as $phoneme) {
+                if ($phoneme['phoneme_score'] >= 60) {
+                    $score_colour = 'green';
+                } else if ($phoneme['phoneme_score'] >= 30) {
+                    $score_colour = 'orange';
+                } else {
+                    $score_colour = 'red';
+                }
+                $phone_label = $phoneme['ipa_label'];
+                $score_colour_class = 'qtype_lcspeech_phoneme_label_' . $score_colour;
+                $word_feedback .= '<div class="qtype_lcspeech_phoneme"><div class="qtype_lcspeech_phoneme_label ' . $score_colour_class . '">' . $phone_label . '</div><div class="qtype_lcspeech_phoneme_score">' . $phoneme['phoneme_score'] . '%</div></div>';
+            }
+            if ($word['mean'] >= 60) {
+                $speechPhrase .= $word['label'] . ' ';
+            } else if ($word['mean'] >= 30) {
+                $speechPhrase .= '<u style="color:orange">' . $word['label'] . '</u>  ';
+            } else {
+                $speechPhrase .= '<u style="color:red">' . $word['label'] . '</u>  ';
+            }
+
+            $feedback .= '<div class="qtype_lcspeech_word"><div class="qtype_lcspeech_word_label">' . $word['label'] . '</div><div class="qtype_lcspeech_phonemes">' . $word_feedback . '</div></div>';
+        }
+
+        return $feedback;
+    }
+
     public function specific_feedback_scripted(question_attempt $qa)
     {
         qtype_lcspeech_ensure_api_config_is_set();
@@ -231,21 +275,21 @@ class qtype_lcspeech_renderer extends qtype_renderer
         $fs = get_file_storage();
         $componentname = $question->qtype->plugin_name();
         //var_dump($slot);
-        if (isset($question->correctionAudios) && !empty($question->correctionAudios)) {
-            foreach ($question->correctionAudios as $corr) {
-                $draftfiles = $fs->get_area_files($question->contextid, $componentname, 'correction_audio', $corr->unique_item_id, 'id', false);
-                if ($draftfiles) {
-                    foreach ($draftfiles as $file) {
-                        if ($file->is_directory()) {
-                            continue;
-                        }
-                        $url = moodle_url::make_pluginfile_url($question->contextid, $componentname, 'correction_audio', "$qubaid/$slot/{$corr->unique_item_id}", '/',  $file->get_filename());
+        // if(isset($question->correctionAudios) && !empty($question->correctionAudios)) {
+        //     foreach ($question->correctionAudios as $corr ) {
+        //         $draftfiles = $fs->get_area_files($question->contextid, $componentname,'correction_audio', $corr->unique_item_id, 'id', false);
+        //         if ($draftfiles) {
+        //             foreach ($draftfiles as $file) {
+        //                 if ($file->is_directory()) {
+        //                     continue;
+        //                 }
+        //                 $url = moodle_url::make_pluginfile_url($question->contextid, $componentname,'correction_audio', "$qubaid/$slot/{$corr->unique_item_id}", '/',  $file->get_filename());
 
-                        $this->urls[] = $url->out();
-                    }
-                }
-            }
-        }
+        //                 $this->urls[] = $url->out();
+        //             }
+        //         }
+        //     }
+        // }
 
         $question = $qa->get_question();
         $response = $qa->get_last_qt_data();
@@ -256,73 +300,35 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $audio = $file->get_content();
                 $result = $question->get_score_for_audio($audio);
 
-                $feedback = '';
+                $feedback = $this->build_pronunciation_feedback($result);
 
-                $words = array_filter(array_map(function ($word) {
-                    return array(
-                        'label' => $word['word_text'],
-                        'mean' => $word['word_score'],
-                        'phones' => array_filter($word['phonemes'], function ($phoneme) {
-                            return $phoneme['ipa_label'] !== 'SIL';
-                        }),
-                    );
-                }, $result['pronunciation']['words']), function ($word) {
-                    return count($word['phones']) > 0;
-                });
-                $speechPhrase = '';
-                foreach ($words as $word) {
-                    $word_feedback = '';
-                    foreach ($word['phones'] as $phoneme) {
-                        if ($phoneme['phoneme_score'] >= 60) {
-                            $score_colour = 'green';
-                        } else if ($phoneme['phoneme_score'] >= 30) {
-                            $score_colour = 'orange';
-                        } else {
-                            $score_colour = 'red';
-                        }
-                        $phone_label = $phoneme['ipa_label'];
-                        $score_colour_class = 'qtype_lcspeech_phoneme_label_' . $score_colour;
-                        $word_feedback .= '<div class="qtype_lcspeech_phoneme"><div class="qtype_lcspeech_phoneme_label ' . $score_colour_class . '">' . $phone_label . '</div><div class="qtype_lcspeech_phoneme_score">' . $phoneme['phoneme_score'] . '%</div></div>';
-                    }
-                    if ($word['mean'] >= 60) {
-                        $speechPhrase .= $word['label'] . ' ';
-                    } else if ($word['mean'] >= 30) {
-                        $speechPhrase .= '<u style="color:orange">' . $word['label'] . '</u>  ';
-                    } else {
-                        $speechPhrase .= '<u style="color:red">' . $word['label'] . '</u>  ';
-                    }
+                // if(isset($question->feedbackRange) && !empty($question->feedbackRange)) {
+                //     foreach ($question->feedbackRange as $r) {
+                //         if($this->nBetween($result['overall_score'], (int)$r->to_range, (int)$r->from_range)) {
+                //             $this->range = $r->feedback;
+                //         }
 
-                    $feedback .= '<div class="qtype_lcspeech_word"><div class="qtype_lcspeech_word_label">' . $word['label'] . '</div><div class="qtype_lcspeech_phonemes">' . $word_feedback . '</div></div>';
-                }
-
-
-                if (isset($question->feedbackRange) && !empty($question->feedbackRange)) {
-                    foreach ($question->feedbackRange as $r) {
-                        if ($this->nBetween($result['overall_score'], (int)$r->to_range, (int)$r->from_range)) {
-                            $this->range = $r->feedback;
-                        }
-
-                        if ((int)$r->to_range === $result['overall_score'] || (int)$r->from_range === $result['overall_score']) {
-                            $this->range = $r->feedback;
-                        }
-                    }
-                }
+                //         if ((int)$r->to_range===$result['overall_score']||(int)$r->from_range===$result['overall_score']) {
+                //             $this->range = $r->feedback;
+                //         }
+                //     }
+                // }
                 // var_dump($result);
                 // var_dump(json_decode($result, true));
                 // var_dump(json_decode($result['overall_score']));
                 // exit;
-                $all_feedback .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_average_score">Average Score IELTS: ' . $result['overall']['english_proficiency_scores']['mock_ielts']['prediction'] . '%</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
+                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Average Score IELTS: ' . $result['overall']['english_proficiency_scores']['mock_ielts']['prediction'] . '%</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
                 $all_feedback .= '<div id="accordion">
                                       <div class="card">
                                         <div class="card-header" id="headingOne">
                                           <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
-                                              Detailed Result
+                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseProFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
+                                              Pronunciation feedback
                                             </button>
                                           </h5>
                                         </div>
                                     
-                                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                        <div id="collapseProFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                                           <div class="card-body">
                                             <div class="qtype_lcspeech_words">' . $feedback . '</div>
                                           </div>
@@ -331,7 +337,8 @@ class qtype_lcspeech_renderer extends qtype_renderer
                                     
                                     </div></div>';
 
-                $fluencyFeedback = $this->feedbackResponse($result);
+                // Fluency feedback
+                $fluencyFeedback = $this->feedback_fluency($result, $question);
                 $all_feedback .= $fluencyFeedback;
             }
             return $question->format_text($all_feedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
@@ -360,21 +367,21 @@ class qtype_lcspeech_renderer extends qtype_renderer
         $fs = get_file_storage();
         $componentname = $question->qtype->plugin_name();
         //var_dump($slot);
-        if (isset($question->correctionAudios) && !empty($question->correctionAudios)) {
-            foreach ($question->correctionAudios as $corr) {
-                $draftfiles = $fs->get_area_files($question->contextid, $componentname, 'correction_audio', $corr->unique_item_id, 'id', false);
-                if ($draftfiles) {
-                    foreach ($draftfiles as $file) {
-                        if ($file->is_directory()) {
-                            continue;
-                        }
-                        $url = moodle_url::make_pluginfile_url($question->contextid, $componentname, 'correction_audio', "$qubaid/$slot/{$corr->unique_item_id}", '/',  $file->get_filename());
+        // if (isset($question->correctionAudios) && !empty($question->correctionAudios)) {
+        //     foreach ($question->correctionAudios as $corr) {
+        //         $draftfiles = $fs->get_area_files($question->contextid, $componentname, 'correction_audio', $corr->unique_item_id, 'id', false);
+        //         if ($draftfiles) {
+        //             foreach ($draftfiles as $file) {
+        //                 if ($file->is_directory()) {
+        //                     continue;
+        //                 }
+        //                 $url = moodle_url::make_pluginfile_url($question->contextid, $componentname, 'correction_audio', "$qubaid/$slot/{$corr->unique_item_id}", '/',  $file->get_filename());
 
-                        $this->urls[] = $url->out();
-                    }
-                }
-            }
-        }
+        //                 $this->urls[] = $url->out();
+        //             }
+        //         }
+        //     }
+        // }
 
         $question = $qa->get_question();
         $response = $qa->get_last_qt_data();
@@ -396,30 +403,32 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $feedback .= '</tbody>';
                 $feedback .= '</table>';
 
-                if (isset($question->feedbackRange) && !empty($question->feedbackRange)) {
-                    foreach ($question->feedbackRange as $r) {
-                        if ($this->nBetween($result['overall'], (int)$r->to_range, (int)$r->from_range)) {
-                            $this->range = $r->feedback;
-                        }
+                $feedbackPronuncation = $this->build_pronunciation_feedback($result);
 
-                        if ((int)$r->to_range === $result['overall'] || (int)$r->from_range === $result['overall']) {
-                            $this->range = $r->feedback;
-                        }
-                    }
-                }
+                // if (isset($question->feedbackRange) && !empty($question->feedbackRange)) {
+                //     foreach ($question->feedbackRange as $r) {
+                //         if ($this->nBetween($result['overall'], (int)$r->to_range, (int)$r->from_range)) {
+                //             $this->range = $r->feedback;
+                //         }
 
-                $all_feedback .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_average_score">Overall Score: ' . $result['overall']['english_proficiency_scores']['mock_ielts']['prediction'] . '</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
+                //         if ((int)$r->to_range === $result['overall'] || (int)$r->from_range === $result['overall']) {
+                //             $this->range = $r->feedback;
+                //         }
+                //     }
+                // }
+
+                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Overall Score: ' . $result['overall']['english_proficiency_scores']['mock_ielts']['prediction'] . '</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
                 $all_feedback .= '<div id="accordion">
                                       <div class="card">
                                         <div class="card-header" id="headingOne">
                                           <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseProFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
                                               Detailed Result
                                             </button>
                                           </h5>
                                         </div>
                                     
-                                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                        <div id="collapseProFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                                           <div class="card-body">
                                             <div class="qtype_lcspeech_words">' . $feedback . '</div>
                                           </div>
@@ -428,7 +437,27 @@ class qtype_lcspeech_renderer extends qtype_renderer
                                     
                                     </div></div>';
 
-                $fluencyFeedback = $this->feedbackResponse($result);
+                $pronunciation_feedback .= '<div id="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h5 class="mb-0">
+                                <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Pronunciation feedback
+                                </button>
+                                </h5>
+                            </div>
+                        
+                            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
+                                </div>
+                            </div>
+                        </div></div>';
+
+                $all_feedback .= $pronunciation_feedback;
+
+                // Fluency feedback
+                $fluencyFeedback = $this->feedback_fluency($result, $question);
                 $all_feedback .= $fluencyFeedback;
             }
 
@@ -437,7 +466,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return '';
     }
 
-    protected function feedbackResponse($response)
+    protected function feedback_fluency($response, $question)
     {
         $content = '
             <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
@@ -446,12 +475,12 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 <div>' . $response['fluency']['feedback']['speech_rate']['feedback_text'] . '</div>
             </div>
             <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of pauses</span><span style="float: right;"></span></div>
+                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of pauses</span><span style="float: right;">'  . $response['fluency']['metrics']['number_of_pauses'] . '</span></div>
                 <div><span style="font-weight: bold">Feedback</span></div>
                 <div>&nbsp;&nbsp;</div>
             </div>
             <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Length of run</span><span style="float: right;"></span></div>
+                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Length of run</span><span style="float: right;">'  . $response['fluency']['metrics']['length_of_run'] . '</span></div>
                 <div><span style="font-weight: bold">Feedback</span></div>
                 <div>&nbsp;&nbsp;</div>
             </div>
@@ -463,13 +492,13 @@ class qtype_lcspeech_renderer extends qtype_renderer
                         <div class="card">
                             <div class="card-header" id="headingOne">
                                 <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseFeedbackOne" aria-expanded="false" aria-controls="collapseFeedbackOne">
+                                    <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseFluency' . $question->id . '" aria-expanded="false" aria-controls="collapseFluency' . $question->id . '">
                                         Fluency feedback
                                     </button>
                                 </h5>
                             </div>
                                             
-                            <div id="collapseFeedbackOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordionFeedback">
+                            <div id="collapseFluency' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordionFeedback">
                                 <div class="card-body">
                                     <div class="qtype_lcspeech_words">' . $content . '</div>
                                 </div>
