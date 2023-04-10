@@ -24,13 +24,15 @@ class qtype_lcspeech_edit_form extends question_edit_form
 
     protected function definition_inner($mform)
     {
+        // var_dump(html_writer::div('Mr', 'toad', array('id' => 'tophat')));
+
         // Field for speech_assessment_type
-        $attributes =  array('onchange' => 'var value = document.getElementById("id_speechtype").value; console.log("fitem_id_speechphrase value: " + value); if (value == "unscripted") { document.getElementById("id_speechphrase").value = "empty"; document.getElementById("fitem_id_speechphrase").style.display = "none"; document.getElementById("fitem_id_idnumber").style.display = "none"; } else { document.getElementById("id_speechphrase").value = ""; document.getElementById("fitem_id_speechphrase").style.display = ""; document.getElementById("fitem_id_idnumber").style.display = ""; }');
+        $attributes =  array('onchange' => $this->onChangeQuestionTypeJS());
         $mform->addElement(
             'select',
             'speechtype',
             get_string('speechtype', 'qtype_lcspeech'),
-            ['scripted' => 'Scripted', 'unscripted' => 'Unscripted'],
+            $this->buildSpeechTypeOptionSelect(),
             $attributes
         );
         $mform->setDefault('speechtype', qtype_lcspeech::DEFAULT_SPEECH_ASSESSMENT);
@@ -66,6 +68,49 @@ class qtype_lcspeech_edit_form extends question_edit_form
         // $mform->disabledIf('speechphrase', 'speechtype', 'eq', 'unscripted');
         // $mform->hideIf('speechphrase', 'speechtype', 'eq', 'unscripted');
         // $mform->hideIf('idnumber', 'speechtype', 'eq', 'unscripted');
+    }
+
+    private function buildSpeechTypeOptionSelect()
+    {
+        $option = array();
+
+        if (get_config('qtype_lcspeech', 'api_scripted_url')) {
+            $option['scripted'] = 'Scripted';
+        }
+        if (get_config('qtype_lcspeech', 'api_unscripted_url')) {
+            $option['unscripted'] = 'Unscripted';
+        }
+        if (get_config('qtype_lcspeech', 'api_pronunciation_url')) {
+            $option['pronunciation'] = 'Pronunciation';
+        }
+
+        // $url_scripted = get_config('qtype_lcspeech', 'api_scripted_url');
+        // $url_unscripted = get_config('qtype_lcspeech', '');
+        // $url_pronunciation = get_config('qtype_lcspeech', '');
+        // var_dump($url);
+        // exit;
+        // } else if ($speechtype == 'unscripted') {
+        //     $url = get_config('qtype_lcspeech', '');
+        // } else if ($speechtype == 'pronunciation') {
+        //     $url = get_config('qtype_lcspeech', '');
+        // }
+
+        // ['scripted'=>'Scripted', 'unscripted'=>'Unscripted', 'pronunciation'=>'Pronunciation']
+        return $option;
+    }
+
+    private function onChangeQuestionTypeJS()
+    {
+        $content = 'var value = document.getElementById("id_speechtype").value; 
+        console.log("fitem_id_speechphrase value: " + value); 
+        if (value == "unscripted") { 
+            document.getElementById("id_speechphrase").value = "empty"; 
+            document.getElementById("fitem_id_speechphrase").style.display = "none"; 
+        } else { 
+            document.getElementById("id_speechphrase").value = ""; 
+            document.getElementById("fitem_id_speechphrase").style.display = ""; 
+        }';
+        return $content;
     }
 
     protected function hideFeedbackAndAudio($mform)

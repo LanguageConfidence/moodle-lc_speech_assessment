@@ -9,7 +9,7 @@
         <FIELD NAME="speechphrase" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="timelimitinseconds" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="30" SEQUENCE="false"/>
         <FIELD NAME="accent" TYPE="char" LENGTH="2" NOTNULL="false" DEFAULT="us" SEQUENCE="false"/>
-        <FIELD NAME="speechtype" TYPE="char" LENGTH="12" NOTNULL="false" DEFAULT="scripted" SEQUENCE="false"/>
+        <FIELD NAME="speechtype" TYPE="char" LENGTH="15" NOTNULL="false" DEFAULT="scripted" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for Moodle question/type/lcspeech"/>

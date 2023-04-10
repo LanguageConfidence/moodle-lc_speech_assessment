@@ -149,7 +149,7 @@ class qtype_lcspeech_question extends question_graded_automatically
         $format = 'wav';
         $payload;
         // check speedtype
-        if ($this->speechtype == 'scripted') {
+        if ($this->speechtype == 'scripted' || $this->speechtype == 'pronunciation') {
             $payload = array(
                 "audio_format" => $format,
                 "expected_text" => $this->speechphrase,
@@ -215,8 +215,10 @@ class qtype_lcspeech_question extends question_graded_automatically
         $url;
         if ($speechtype == 'scripted') {
             $url = get_config('qtype_lcspeech', 'api_scripted_url');
-        } else {
+        } else if ($speechtype == 'unscripted') {
             $url = get_config('qtype_lcspeech', 'api_unscripted_url');
+        } else if ($speechtype == 'pronunciation') {
+            $url = get_config('qtype_lcspeech', 'api_pronunciation_url');
         }
 
         $endpoint = "{$url}/{$this->accent}";
@@ -240,8 +242,18 @@ class qtype_lcspeech_question extends question_graded_automatically
         // var_dump($result_raw);
         $result = json_decode($result_raw, true);
         // var_dump($result);
-        // exit;
-        if (array_key_exists('overall', $result)) {
+        // var_dump("=======================");
+        // var_dump('</br>');
+        if ($result == null) {
+            return array(
+                'success' => false,
+                'raw_response' => $result_raw,
+                'parsed_response' => $result,
+                'error_message' => 'Failed to get the score - Can not get response from API'
+            );
+        }
+
+        if (array_key_exists('overall', $result) || array_key_exists('overall_score', $result)) {
             return array(
                 'success' => true,
                 'raw_response' => $result_raw,

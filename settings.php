@@ -50,6 +50,11 @@ if ($ADMIN->fulltree) {
         4
     ));
 
+    // Unscripted settings
     $settings->add(new admin_setting_heading('speech_assessment_unscripted_settings_heading', get_string('speech_assessment_unscripted_settings_heading', 'qtype_lcspeech'), ''));
     $settings->add(new admin_setting_configtext('qtype_lcspeech/api_unscripted_url', get_string('api_unscripted_url', 'qtype_lcspeech'), '', ''));
+
+    // Pronunciation settings
+    $settings->add(new admin_setting_heading('speech_assessment_pronunciation_settings_heading', get_string('speech_assessment_pronunciation_settings_heading', 'qtype_lcspeech'), ''));
+    $settings->add(new admin_setting_configtext('qtype_lcspeech/api_pronunciation_url', get_string('api_pronunciation_url', 'qtype_lcspeech'), '', ''));
 }

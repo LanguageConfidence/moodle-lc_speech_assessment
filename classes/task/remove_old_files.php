@@ -83,7 +83,7 @@ class remove_old_files extends scheduled_task
 
         $allFilesRecord;
         $dbtype = $CFG->dbtype;
-        $days = get_config('qtype_languageconfidence', 'daysolderaudiofiles');
+        $days = get_config('qtype_lcspeech', 'daysolderaudiofiles');
         if ($dbtype == 'pgsql') {
             $allFilesRecord = $DB->get_records_sql(
                 "
