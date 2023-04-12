@@ -53,7 +53,7 @@ class qtype_lcspeech_edit_form extends question_edit_form
             'duration',
             'timelimitinseconds',
             get_string('timelimit', 'qtype_lcspeech'),
-            ['units' => [60, 1], 'optional' => false]
+            ['units' => [1], 'optional' => false]
         );
         $mform->addHelpButton('timelimitinseconds', 'timelimit', 'qtype_lcspeech');
         $mform->setDefault('timelimitinseconds', qtype_lcspeech::DEFAULT_TIMELIMIT);

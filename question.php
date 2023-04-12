@@ -285,7 +285,11 @@ class qtype_lcspeech_question extends question_graded_automatically
                 $audio = $file->get_content();
                 $result = $this->get_score_for_audio($audio);
                 // array_push($scores, $result['overall_score'] / 100);
-                array_push($scores, $result['overall']['english_proficiency_scores']['mock_ielts']['prediction'] / 10);
+                if ($this->speechtype == 'pronunciation') {
+                    array_push($scores, $result['overall_score'] / 100);
+                } else {
+                    array_push($scores, $result['overall']['english_proficiency_scores']['mock_ielts']['prediction'] / 10);
+                }
             }
         }
         $total = array_sum($scores);

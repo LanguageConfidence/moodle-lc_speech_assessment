@@ -41,14 +41,7 @@ if ($ADMIN->fulltree) {
     //other settings
     $settings->add(new admin_setting_heading('speech_assessment_scripted_settings_heading', get_string('speech_assessment_scripted_settings_heading', 'qtype_lcspeech'), ''));
     $settings->add(new admin_setting_configtext('qtype_lcspeech/api_scripted_url', get_string('api_scripted_url', 'qtype_lcspeech'), '', ''));
-    $settings->add(new admin_setting_configtext(
-        'qtype_lcspeech/daysolderaudiofiles',
-        get_string('daysolderaudiofiles', 'qtype_lcspeech'),
-        get_string('daysolderaudiofiles_desc', 'qtype_lcspeech'),
-        15,
-        PARAM_INT,
-        4
-    ));
+
 
     // Unscripted settings
     $settings->add(new admin_setting_heading('speech_assessment_unscripted_settings_heading', get_string('speech_assessment_unscripted_settings_heading', 'qtype_lcspeech'), ''));
@@ -57,4 +50,15 @@ if ($ADMIN->fulltree) {
     // Pronunciation settings
     $settings->add(new admin_setting_heading('speech_assessment_pronunciation_settings_heading', get_string('speech_assessment_pronunciation_settings_heading', 'qtype_lcspeech'), ''));
     $settings->add(new admin_setting_configtext('qtype_lcspeech/api_pronunciation_url', get_string('api_pronunciation_url', 'qtype_lcspeech'), '', ''));
+
+    // Other settings
+    $settings->add(new admin_setting_heading('otheroptionsetting', get_string('otheroptionsetting', 'qtype_lcspeech'), ''));
+    $settings->add(new admin_setting_configtext(
+        'qtype_lcspeech/daysolderaudiofiles',
+        get_string('daysolderaudiofiles', 'qtype_lcspeech'),
+        get_string('daysolderaudiofiles_desc', 'qtype_lcspeech'),
+        15,
+        PARAM_INT,
+        4
+    ));
 }

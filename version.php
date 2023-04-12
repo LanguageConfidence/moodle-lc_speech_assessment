@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Speech Assessment question type version information.
  *

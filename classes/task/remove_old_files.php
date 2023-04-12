@@ -4,7 +4,7 @@
 
 /** @noinspection SqlNoDataSourceInspection */
 
-namespace qtype_languageconfidence\task;
+namespace qtype_lcspeech\task;
 
 use core\task\scheduled_task;
 
