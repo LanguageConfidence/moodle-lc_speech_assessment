@@ -507,8 +507,10 @@ class qtype_lcspeech_renderer extends qtype_renderer
     protected function render_metadata($response, $question)
     {
         $expected_text = "";
+        $relevance_score = "";
         if ($question->speechtype == 'scripted') {
             $expected_text = $response['pronunciation']['expected_text'];
+            $relevance_score = $response['metadata']['content_relevance'];
         }
 
         $content = '
@@ -522,7 +524,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
             </div>
             <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
                 <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Relevance score</span></div>
-                <div></div>
+                <div>' . $relevance_score . '</div>
             </div>
         ';
 

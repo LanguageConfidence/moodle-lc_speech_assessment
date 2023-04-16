@@ -226,7 +226,8 @@ class qtype_lcspeech_question extends question_graded_automatically
         $header = array(
             'Content-Type: application/json',
             'x-blobr-key: ' . $api_key,
-            'x-user-id:' . $USER->id
+            'x-user-id:' . $USER->id,
+            'lc-beta-features: true'
         );
 
         $postdata = json_encode($payload);
