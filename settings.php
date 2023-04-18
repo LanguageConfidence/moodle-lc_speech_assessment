@@ -6,6 +6,8 @@
  * @package   qtype_lcspeech
  * @copyright 2023 Speech Assessment
  */
+require_once($CFG->dirroot . '/question/type/lcspeech/lcspeech_admin_setting_configduration.php');
+require_once($CFG->dirroot . '/question/type/lcspeech/lcspeech_admin_setting_configtext.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -20,11 +22,11 @@ if ($ADMIN->fulltree) {
     ));
 
     // Recording time limit.
-    $settings->add(new admin_setting_configduration(
+    $settings->add(new lcspeech_admin_setting_configduration(
         'qtype_lcspeech/timelimit',
         get_string('timelimit', 'qtype_lcspeech'),
         get_string('timelimit_desc', 'qtype_lcspeech'),
-        60,
+        ['units' => [1], 'optional' => false],
         60
     ));
 
@@ -40,16 +42,21 @@ if ($ADMIN->fulltree) {
 
     //other settings
     $settings->add(new admin_setting_heading('speech_assessment_scripted_settings_heading', get_string('speech_assessment_scripted_settings_heading', 'qtype_lcspeech'), ''));
-    $settings->add(new admin_setting_configtext('qtype_lcspeech/api_scripted_url', get_string('api_scripted_url', 'qtype_lcspeech'), '', ''));
+    $settings->add(new lcspeech_admin_setting_configtext('qtype_lcspeech/api_scripted_url', get_string('api_scripted_url', 'qtype_lcspeech'), '', ''));
 
 
     // Unscripted settings
     $settings->add(new admin_setting_heading('speech_assessment_unscripted_settings_heading', get_string('speech_assessment_unscripted_settings_heading', 'qtype_lcspeech'), ''));
-    $settings->add(new admin_setting_configtext('qtype_lcspeech/api_unscripted_url', get_string('api_unscripted_url', 'qtype_lcspeech'), '', ''));
+    $settings->add(new lcspeech_admin_setting_configtext('qtype_lcspeech/api_unscripted_url', get_string('api_unscripted_url', 'qtype_lcspeech'), '', ''));
 
     // Pronunciation settings
     $settings->add(new admin_setting_heading('speech_assessment_pronunciation_settings_heading', get_string('speech_assessment_pronunciation_settings_heading', 'qtype_lcspeech'), ''));
-    $settings->add(new admin_setting_configtext('qtype_lcspeech/api_pronunciation_url', get_string('api_pronunciation_url', 'qtype_lcspeech'), '', ''));
+    $settings->add(new lcspeech_admin_setting_configtext(
+        'qtype_lcspeech/api_pronunciation_url',
+        get_string('api_pronunciation_url', 'qtype_lcspeech'),
+        '',
+        ''
+    ));
 
     // Other settings
     $settings->add(new admin_setting_heading('otheroptionsetting', get_string('otheroptionsetting', 'qtype_lcspeech'), ''));
