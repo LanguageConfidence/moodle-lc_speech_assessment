@@ -68,4 +68,11 @@ if ($ADMIN->fulltree) {
         PARAM_INT,
         4
     ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_lcspeech/noexpirationaudio',
+        get_string('noexpirationaudio', 'qtype_lcspeech'),
+        get_string('noexpirationaudio_desc', 'qtype_lcspeech'),
+        0
+    ));
 }

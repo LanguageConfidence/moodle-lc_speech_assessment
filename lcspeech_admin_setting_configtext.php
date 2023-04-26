@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Question type class for the Speech Assessment question type.
  *
@@ -18,8 +19,10 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @copyright 2023 Speech Assessment
  */
-class lcspeech_admin_setting_configtext extends admin_setting_configtext {
-    public function write_setting($data) {
+class lcspeech_admin_setting_configtext extends admin_setting_configtext
+{
+    public function write_setting($data)
+    {
         $newdata = trim($data);
         $lastchar = substr($newdata, -1);
         if ($lastchar == "/") {

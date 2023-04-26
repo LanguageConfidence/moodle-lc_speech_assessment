@@ -90,3 +90,5 @@ $string['api_unscripted_url'] = 'Unscripted API URL';
 $string['api_pronunciation_url'] = 'Pronunciation API URL';
 $string['speechtype'] = 'Speech assessment type';
 $string['otheroptionsetting'] = 'Other options';
+$string['noexpirationaudio'] = 'No expiration';
+$string['noexpirationaudio_desc'] = 'No expiration audio';

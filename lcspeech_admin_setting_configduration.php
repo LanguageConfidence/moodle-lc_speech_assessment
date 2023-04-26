@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Question type class for the Speech Assessment question type.
  *
@@ -18,20 +19,23 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @copyright 2023 Speech Assessment
  */
-class lcspeech_admin_setting_configduration extends admin_setting_configduration {
-    public function validate($data) {
+class lcspeech_admin_setting_configduration extends admin_setting_configduration
+{
+    public function validate($data)
+    {
         return false;
         // your custom validation logic here
         var_dump($data);
         exit;
     }
 
-    public function write_setting($data) {
+    public function write_setting($data)
+    {
         $total_sec = $data["v"] * $data["u"];
         if ($total_sec > 60) {
             return "Maximum recording duration cannot be greater than 60 secs";
         }
-        
+
         return parent::write_setting($data);
     }
 }

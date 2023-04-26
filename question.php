@@ -156,9 +156,12 @@ class qtype_lcspeech_question extends question_graded_automatically
                 "audio_base64" => base64_encode($audio)
             );
         } else {
+            // unscripted
+            $questionContent = strip_tags($this->questiontext);
             $payload = array(
                 "audio_format" => $format,
-                "audio_base64" => base64_encode($audio)
+                "audio_base64" => base64_encode($audio),
+                "context" => array("question" => $questionContent)
             );
         }
 
@@ -231,7 +234,6 @@ class qtype_lcspeech_question extends question_graded_automatically
         );
 
         $postdata = json_encode($payload);
-        // var_dump($postdata);
         $ch = curl_init($endpoint);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
