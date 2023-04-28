@@ -541,6 +541,17 @@ class qtype_lcspeech_renderer extends qtype_renderer
                     <div>' . $response['metadata']['content_relevance_feedback'] . '</div>
                 </div>
             ';
+
+            if (isset($response['metadata']['valid_answer'])) {
+                $valid_answer = str_replace('_', ' ', $response['metadata']['valid_answer']);
+
+                $content .= '
+                    <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
+                        <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Valid answer</span></div>
+                        <div>' . $valid_answer . '</div>
+                    </div>
+                ';
+            }
         }
 
         return $content;
@@ -550,9 +561,8 @@ class qtype_lcspeech_renderer extends qtype_renderer
     {
         $content .= '<table class="generaltable generalbox quizreviewsummary">';
         $content .= '<tbody>';
-        $content .= '<tr><th class="cell" scope="row">ielts</th><td class="cell">' . $result['grammar']['english_proficiency_scores']['mock_ielts']['prediction'] . '</td></tr>';
-        $content .= '<tr><th class="cell" scope="row">cefr</th><td class="cell">' . $result['grammar']['english_proficiency_scores']['mock_cefr']['prediction'] . '</td></tr>';
-        $content .= '<tr><th class="cell" scope="row">pte</th><td class="cell">' . $result['grammar']['english_proficiency_scores']['mock_pte']['prediction'] . '</td></tr>';
+        $content .= '<tr><th class="cell" scope="row">Grammar mistake count</th><td class="cell">' . $result['grammar']['metrics']['mistake_count'] . '</td></tr>';
+        $content .= '<tr><th class="cell" scope="row">Grammatical complexity</th><td class="cell">' . $result['grammar']['metrics']['grammatical_complexity'] . '</td></tr>';
         $content .= '</tbody>';
         $content .= '</table>';
 
@@ -582,9 +592,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
     {
         $content .= '<table class="generaltable generalbox quizreviewsummary">';
         $content .= '<tbody>';
-        $content .= '<tr><th class="cell" scope="row">ielts</th><td class="cell">' . $result['vocabulary']['english_proficiency_scores']['mock_ielts']['prediction'] . '</td></tr>';
-        $content .= '<tr><th class="cell" scope="row">cefr</th><td class="cell">' . $result['vocabulary']['english_proficiency_scores']['mock_cefr']['prediction'] . '</td></tr>';
-        $content .= '<tr><th class="cell" scope="row">pte</th><td class="cell">' . $result['vocabulary']['english_proficiency_scores']['mock_pte']['prediction'] . '</td></tr>';
+        $content .= '<tr><th class="cell" scope="row">Vocabulary complexity</th><td class="cell">' . $result['vocabulary']['metrics']['vocabulary_complexity'] . '</td></tr>';
         $content .= '</tbody>';
         $content .= '</table>';
 

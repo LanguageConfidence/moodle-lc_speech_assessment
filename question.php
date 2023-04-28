@@ -157,14 +157,26 @@ class qtype_lcspeech_question extends question_graded_automatically
             );
         } else {
             // unscripted
-            $questionContent = strip_tags($this->questiontext);
             $payload = array(
                 "audio_format" => $format,
-                "audio_base64" => base64_encode($audio),
-                "context" => array("question" => $questionContent)
+                "audio_base64" => base64_encode($audio)
             );
-        }
 
+            $context = array();
+            if (!empty($this->contextquestion)) {
+                $context["question"] = $this->contextquestion;
+            }
+            if (!empty($this->contextdescription)) {
+                $context["context_description"] = $this->contextdescription;
+            }
+            if (!empty($this->contextvalidanswerdescription)) {
+                $context["valid_answer_description"] = $this->contextvalidanswerdescription;
+            }
+
+            if (count($context) > 0) {
+                $payload["context"] = $context;
+            }
+        }
 
         $payload_keys = array_keys($payload);
         sort($payload_keys);
@@ -244,7 +256,10 @@ class qtype_lcspeech_question extends question_graded_automatically
         curl_close($ch);
         // var_dump($result_raw);
         $result = json_decode($result_raw, true);
-        // var_dump($result);
+        // var_dump($endpoint);
+        // var_dump('</br>');
+        // var_dump($payload);
+        // exit;
         // var_dump("=======================");
         // var_dump('</br>');
         if ($result == null) {

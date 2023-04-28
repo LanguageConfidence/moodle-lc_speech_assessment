@@ -37,17 +37,6 @@ class qtype_lcspeech_edit_form extends question_edit_form
         );
         $mform->setDefault('speechtype', qtype_lcspeech::DEFAULT_SPEECH_ASSESSMENT);
 
-        // Field for speechphrase.
-        $mform->addElement(
-            'text',
-            'speechphrase',
-            get_string('speechphrase', 'qtype_lcspeech'),
-            array('maxlength' => 1000, 'size' => 100)
-        );
-        $mform->addHelpButton('speechphrase', 'speechphrase', 'qtype_lcspeech');
-        $mform->addRule('speechphrase', null, 'required', null, 'client');
-        $mform->setType('speechphrase', PARAM_TEXT);
-
         // Field for timelimitinseconds.
         $mform->addElement(
             'duration',
@@ -62,6 +51,57 @@ class qtype_lcspeech_edit_form extends question_edit_form
         $mform->addElement('select', 'accent', get_string('accent', 'qtype_lcspeech'), ['us' => 'American (US)', 'uk' => 'British (UK)']);
         $mform->setDefault('accent', qtype_lcspeech::DEFAULT_ACCENT);
 
+        // Field for speechphrase.
+        $mform->addElement(
+            'text',
+            'speechphrase',
+            get_string('speechphrase', 'qtype_lcspeech'),
+            array('maxlength' => 1000, 'size' => 100)
+        );
+        $mform->addHelpButton('speechphrase', 'speechphrase', 'qtype_lcspeech');
+        $mform->addRule('speechphrase', null, 'required', null, 'client');
+        $mform->setType('speechphrase', PARAM_TEXT);
+
+        // checkbox has content relevance
+        // $mform->addElement('advcheckbox', 'hascontext', get_string('has_content_relevance', 'qtype_lcspeech'));
+        $mform->addElement('selectyesno', 'hascontext', get_string('has_content_relevance', 'qtype_lcspeech'));
+
+        // context question
+        $mform->addElement(
+            'text',
+            'contextquestion',
+            get_string('contextquestion', 'qtype_lcspeech'),
+            array('maxlength' => 1000, 'size' => 100)
+        );
+        $mform->addHelpButton('contextquestion', 'contextquestion', 'qtype_lcspeech');
+        $mform->setType('contextquestion', PARAM_TEXT);
+
+        // context description
+        $mform->addElement(
+            'text',
+            'contextdescription',
+            get_string('contextdescription', 'qtype_lcspeech'),
+            array('maxlength' => 1000, 'size' => 100)
+        );
+        $mform->addHelpButton('contextdescription', 'contextdescription', 'qtype_lcspeech');
+        $mform->setType('contextdescription', PARAM_TEXT);
+
+        // valid_answer_description
+        $mform->addElement(
+            'text',
+            'contextvalidanswerdescription',
+            get_string('contextvalidanswerdescription', 'qtype_lcspeech'),
+            array('maxlength' => 1000, 'size' => 100)
+        );
+        $mform->addHelpButton('contextvalidanswerdescription', 'contextvalidanswerdescription', 'qtype_lcspeech');
+        $mform->setType('contextvalidanswerdescription', PARAM_TEXT);
+
+        // Disable context... control when a hascontext dropdown has value '0'.
+        $mform->hideIf('hascontext', 'speechtype', 'neq', 'unscripted');
+
+        $mform->hideIf('contextquestion', 'hascontext', '0');
+        $mform->hideIf('contextdescription', 'hascontext', '0');
+        $mform->hideIf('contextvalidanswerdescription', 'hascontext', '0');
 
         $this::hideFeedbackAndAudio($mform);
         // process case Edit
@@ -106,9 +146,17 @@ class qtype_lcspeech_edit_form extends question_edit_form
         if (value == "unscripted") { 
             document.getElementById("id_speechphrase").value = "empty"; 
             document.getElementById("fitem_id_speechphrase").style.display = "none"; 
+            document.getElementById("fitem_id_hascontext").style.display = ""; 
+            document.getElementById("fitem_id_contextquestion").style.display = ""; 
+            document.getElementById("fitem_id_contextdescription").style.display = ""; 
+            document.getElementById("fitem_id_contextvalidanswerdescription").style.display = ""; 
         } else { 
             document.getElementById("id_speechphrase").value = ""; 
             document.getElementById("fitem_id_speechphrase").style.display = ""; 
+            document.getElementById("fitem_id_hascontext").style.display = "none"; 
+            document.getElementById("fitem_id_contextquestion").style.display = "none"; 
+            document.getElementById("fitem_id_contextdescription").style.display = "none"; 
+            document.getElementById("fitem_id_contextvalidanswerdescription").style.display = "none";
         }';
         return $content;
     }

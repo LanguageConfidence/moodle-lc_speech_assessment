@@ -44,7 +44,9 @@ class qtype_lcspeech extends question_type
 
     public function extra_question_fields()
     {
-        return array('qtype_lcspeech_options', 'mediatype', 'speechphrase', 'timelimitinseconds', 'accent', 'speechtype');
+        return array(
+            'qtype_lcspeech_options', 'mediatype', 'speechphrase', 'timelimitinseconds', 'accent', 'speechtype', 'hascontext', 'contextquestion', 'contextdescription', 'contextvalidanswerdescription'
+        );
     }
 
     protected function initialise_question_instance(question_definition $question, $questiondata)
@@ -56,6 +58,10 @@ class qtype_lcspeech extends question_type
         $question->mediatype = $questiondata->options->mediatype;
         $question->accent = $questiondata->options->accent;
         $question->speechtype = $questiondata->options->speechtype;
+        $question->hascontext = $questiondata->options->hascontext;
+        $question->contextquestion = $questiondata->options->contextquestion;
+        $question->contextdescription = $questiondata->options->contextdescription;
+        $question->contextvalidanswerdescription = $questiondata->options->contextvalidanswerdescription;
         $question->widgetplaceholders = $this->get_widget_placeholders($questiondata->questiontext);
         $question->feedbackRange = $questiondata->options->range ?? null;
         $question->correctionAudios = $questiondata->options->audios ?? null;
@@ -82,6 +88,15 @@ class qtype_lcspeech extends question_type
             "</timelimitinseconds>\n";
         $output .= '    <speechtype>' . $question->options->speechtype .
             "</speechtype>\n";
+        $output .= '    <hascontext>' . $question->options->hascontext .
+            "</hascontext>\n";
+        $output .= '    <contextquestion>' . $question->options->contextquestion .
+            "</contextquestion>\n";
+        $output .= '    <contextdescription>' . $question->options->contextdescription .
+            "</contextdescription>\n";
+        $output .= '    <contextvalidanswerdescription>' . $question->options->contextvalidanswerdescription .
+            "</contextvalidanswerdescription>\n";
+
         return $output;
     }
 
