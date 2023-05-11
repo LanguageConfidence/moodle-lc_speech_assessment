@@ -24,10 +24,18 @@ class remove_old_files extends scheduled_task
      */
     public function execute()
     {
+        global $DB, $CFG;
+        require_once($CFG->libdir . '/questionlib.php');
+
+        // check no expire
+        $isnoexpiration = get_config('qtype_lcspeech', 'noexpirationaudio');
+        if ($isnoexpiration) {
+            mtrace('Setting no expiration audio, value: ' . $isnoexpiration);
+            return;
+        }
+
         mtrace('START execute remove old files');
         try {
-            global $DB, $CFG;
-            require_once($CFG->libdir . '/questionlib.php');
             $fs = get_file_storage();
             $days = get_config('qtype_lcspeech', 'daysolderaudiofiles');
             mtrace('config daysolderaudiofiles: ' . $days . ' days');

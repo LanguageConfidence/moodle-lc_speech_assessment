@@ -472,14 +472,14 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 <div>' . $response['fluency']['feedback']['speech_rate']['feedback_text'] . '</div>
             </div>
             <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of pauses</span><span style="float: right;">'  . $response['fluency']['metrics']['number_of_pauses'] . '</span></div>
+                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of pauses</span><span style="float: right;">'  . $response['fluency']['metrics']['pauses'] . '</span></div>
                 <div><span style="font-weight: bold">Feedback</span></div>
-                <div>&nbsp;&nbsp;</div>
+                <div>' . $response['fluency']['feedback']['pauses']['feedback_text'] . '</div>
             </div>
             <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Length of run</span><span style="float: right;">'  . $response['fluency']['metrics']['length_of_run'] . '</span></div>
+                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of filler words</span><span style="float: right;">'  . $response['fluency']['metrics']['filler_words'] . '</span></div>
                 <div><span style="font-weight: bold">Feedback</span></div>
-                <div>&nbsp;&nbsp;</div>
+                <div>' . $response['fluency']['feedback']['filler_words']['feedback_text'] . '</div>
             </div>
         ';
 

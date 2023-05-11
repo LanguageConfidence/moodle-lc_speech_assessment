@@ -9,7 +9,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023042700;
+$plugin->version   = 2023051100;
 $plugin->requires  = 2020061500;
 $plugin->component = 'qtype_lcspeech';
 $plugin->maturity  = MATURITY_STABLE;
