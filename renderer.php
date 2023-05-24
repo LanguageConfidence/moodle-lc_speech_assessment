@@ -288,21 +288,19 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
                 $feedbackPronuncation = $this->build_pronunciation_feedback($result['words']);
 
-                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Overall score: ' . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
+                $all_feedback .= '<div><div class="qtype_lcspeech_average_score">Overall score: ' . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
                 $pronunciation_feedback .= '<div id="accordion">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
+                    <div >
+                        <div  id="headingOne">
                             <h5 class="mb-0">
-                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapsePro2Feedback-' . $question->id . '" aria-expanded="false" aria-controls="collapsePro2Feedback-' . $question->id . '">
-                                Pronunciation feedback
+                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapsePro2Feedback-' . $question->id . '" aria-expanded="false" aria-controls="collapsePro2Feedback-' . $question->id . '">
+                                Pronunciation
                             </button>
                             </h5>
                         </div>
                     
                         <div id="collapsePro2Feedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                            <div class="card-body">
                             <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
-                            </div>
                         </div>
                     </div></div>';
 
@@ -336,28 +334,43 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $feedback = $this->build_pronunciation_feedback($result['pronunciation']['words']);
 
                 // Speaking score
-                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Speaking score</div>';
+                $all_feedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
+                $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score($result, $question);
                 $all_feedback .= $speakingscore;
 
                 // Metadata - Content Relevance
-                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Content Relevance</div>';
                 $metadata = $this->render_metadata($result, $question);
-                $all_feedback .= $metadata;
-
-                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Speaking skills feedback</div>';
-                $all_feedback .= '<div id="accordion">
-                                      <div class="card">
-                                        <div class="card-header" id="headingOne">
+                $all_feedback .= '</div><div id="accordion">
+                                      <div>
+                                        <div id="headingOne">
                                           <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseProFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
-                                              Pronunciation feedback
+                                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
+                                                Content relevance
+                                            </button>
+                                          </h5>
+                                        </div>
+                                    
+                                        <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                            <div class="qtype_lcspeech_words">' . $metadata . '</div>
+                                        </div>
+                                      </div>
+                                    </div>';
+                //
+
+                $all_feedback .= '<div>';
+                $all_feedback .= '<div id="accordion">
+                                      <div>
+                                        <div id="headingOne">
+                                          <h5 class="mb-0">
+                                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseProFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
+                                              Pronunciation
                                             </button>
                                           </h5>
                                         </div>
                                     
                                         <div id="collapseProFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                          <div class="card-body">
+                                          <div class="card-body box-border" style="margin: 15px 0 15px 0;">
                                             <div class="qtype_lcspeech_words">' . $feedback . '</div>
                                           </div>
                                         </div>
@@ -413,29 +426,43 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $feedbackPronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
 
                 // Speaking score
-                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Speaking score</div>';
-                $speakingscore = $this->render_speaking_score($result, $question);
+                $all_feedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
+                $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
+                $speakingscore = $this->render_speaking_score_unscripted($result, $question);
                 $all_feedback .= $speakingscore;
 
                 // Metadata - Content Relevance
-                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Content Relevance</div>';
                 $metadata = $this->render_metadata($result, $question);
-                $all_feedback .= $metadata;
+                $all_feedback .= '</div><div id="accordion">
+                                      <div>
+                                        <div id="headingOne">
+                                          <h5 class="mb-0">
+                                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
+                                                Content relevance
+                                            </button>
+                                          </h5>
+                                        </div>
+                                    
+                                        <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                            <div class="qtype_lcspeech_words">' . $metadata . '</div>
+                                        </div>
+                                      </div>
+                                    </div>';
 
-                $all_feedback .= '<div class=""><div class="qtype_lcspeech_average_score">Speaking skills feedback</div>';
+                $all_feedback .= '<div>';
 
                 $pronunciation_feedback .= '<div id="accordion">
-                    <div class="card">
-                        <div class="card-header" id="headingOne">
+                    <div>
+                        <div id="headingOne">
                             <h5 class="mb-0">
-                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapsePro2Feedback-' . $question->id . '" aria-expanded="false" aria-controls="collapsePro2Feedback-' . $question->id . '">
-                                Pronunciation feedback
+                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapsePro2Feedback-' . $question->id . '" aria-expanded="false" aria-controls="collapsePro2Feedback-' . $question->id . '">
+                                Pronunciation
                             </button>
                             </h5>
                         </div>
                     
                         <div id="collapsePro2Feedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                            <div class="card-body">
+                            <div class="card-body box-border" style="margin: 15px 0 15px 0;">
                             <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
                             </div>
                         </div>
@@ -466,39 +493,44 @@ class qtype_lcspeech_renderer extends qtype_renderer
     protected function feedback_fluency($response, $question)
     {
         $content = '
-            <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Speech Rate</span><span style="float: right;">'  . $response['fluency']['metrics']['speech_rate'] . '</span></div>
-                <div><span style="font-weight: bold">Feedback</span></div>
+            <div class="feedback-card box-border">
+                <div>
+                    <span class="bold-text">Speech Rate</span>
+                    <span>'  . $response['fluency']['metrics']['speech_rate'] . '</span>
+                </div>
                 <div>' . $response['fluency']['feedback']['speech_rate']['feedback_text'] . '</div>
             </div>
-            <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of pauses</span><span style="float: right;">'  . $response['fluency']['metrics']['pauses'] . '</span></div>
-                <div><span style="font-weight: bold">Feedback</span></div>
+            <div class="feedback-card box-border">
+                <div >
+                    <span class="bold-text">Number of pauses</span>
+                    <span>'  . $response['fluency']['metrics']['pauses'] . '</span>
+                </div>
                 <div>' . $response['fluency']['feedback']['pauses']['feedback_text'] . '</div>
             </div>
-            <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Number of filler words</span><span style="float: right;">'  . $response['fluency']['metrics']['filler_words'] . '</span></div>
-                <div><span style="font-weight: bold">Feedback</span></div>
+            <div class="feedback-card box-border">
+                <div >
+                    <span class="bold-text">Number of filler words</span>
+                    <span>'  . $response['fluency']['metrics']['filler_words'] . '</span>
+                </div>
                 <div>' . $response['fluency']['feedback']['filler_words']['feedback_text'] . '</div>
             </div>
+            
         ';
 
         $feedback = '';
 
         $feedback .= '<div id="accordionFeedback">
-                        <div class="card">
-                            <div class="card-header" id="headingOne">
+                        <div>
+                            <div  id="headingOne">
                                 <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseFluency' . $question->id . '" aria-expanded="false" aria-controls="collapseFluency' . $question->id . '">
+                                    <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseFluency' . $question->id . '" aria-expanded="false" aria-controls="collapseFluency' . $question->id . '">
                                         Fluency feedback
                                     </button>
                                 </h5>
                             </div>
                                             
                             <div id="collapseFluency' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordionFeedback">
-                                <div class="card-body">
                                     <div class="qtype_lcspeech_words">' . $content . '</div>
-                                </div>
                             </div>
                         </div>
                     </div>';
@@ -511,16 +543,16 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
         if ($question->speechtype == 'scripted') {
             $content = '
-                <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                    <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Predicted text</span></div>
+                <div class="metadata-card box-border">
+                    <div><span class="bold-text">Predicted text</span></div>
                     <div>' . $response['metadata']['predicted_text'] . '</div>
                 </div>
-                <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                    <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Expected text</span></div>
+                <div class="metadata-card box-border">
+                    <div><span class="bold-text">Expected text</span></div>
                     <div>' . $response['pronunciation']['expected_text'] . '</div>
                 </div>
-                <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                    <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Relevance score</span></div>
+                <div class="metadata-card box-border">
+                    <div><span class="bold-text">Relevance score</span></div>
                     <div>' . $response['metadata']['content_relevance'] . '</div>
                 </div>
             ';
@@ -528,17 +560,13 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
         if ($question->speechtype == 'unscripted') {
             $content = '
-                <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                    <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Predicted text</span></div>
+                <div class="metadata-card box-border">
+                    <div><span class="bold-text">Predicted text</span></div>
                     <div>' . $response['metadata']['predicted_text'] . '</div>
                 </div>
-                <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                    <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Content relevance</span></div>
+                <div class="metadata-card box-border">
+                    <div><span class="bold-text">Expected text</span></div>
                     <div>' . $response['metadata']['content_relevance'] . '</div>
-                </div>
-                <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                    <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Content relevance feedback</span></div>
-                    <div>' . $response['metadata']['content_relevance_feedback'] . '</div>
                 </div>
             ';
 
@@ -546,8 +574,8 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $valid_answer = str_replace('_', ' ', $response['metadata']['valid_answer']);
 
                 $content .= '
-                    <div style="border-left: 3px #0fa1bfe3 solid;padding-left: 5px;margin-bottom: 15px;">
-                        <div style="border-bottom: 1px solid #00000040;margin-bottom: 10px;"><span style="font-weight: bold;color: #0fa1bfe3;">Valid answer</span></div>
+                    <div class="metadata-card box-border">
+                        <div><span class="bold-text">Valid answer</span></div>
                         <div>' . $valid_answer . '</div>
                     </div>
                 ';
@@ -559,29 +587,37 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
     protected function render_grammar($result, $question)
     {
-        $content .= '<table class="generaltable generalbox quizreviewsummary">';
-        $content .= '<tbody>';
-        $content .= '<tr><th class="cell" scope="row">Grammar mistake count</th><td class="cell">' . $result['grammar']['metrics']['mistake_count'] . '</td></tr>';
-        $content .= '<tr><th class="cell" scope="row">Grammatical complexity</th><td class="cell">' . $result['grammar']['metrics']['grammatical_complexity'] . '</td></tr>';
-        $content .= '</tbody>';
-        $content .= '</table>';
+        $labelStyle = 'comlexity_label_' . $result['grammar']['metrics']['grammatical_complexity'];
+        $content = '';
+        $content .= '
+            <div class="feedback-card box-border">
+                <div>
+                    <span class="bold-text">Grammar mistake count</span>
+                    <span>' . $result['grammar']['metrics']['mistake_count'] . '</span>
+                </div>
+            </div>
+            <div class="feedback-card box-border">
+                <div>
+                    <span class="bold-text">Grammatical complexity</span>
+                    <span class="' . $labelStyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
+                </div>
+            </div>
+            ';
 
         $grammar = '';
 
         $grammar .= '<div id="accordionGrammar">
-                        <div class="card">
-                            <div class="card-header" id="headingOne">
+                        <div >
+                            <div  id="headingOne">
                                 <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseGrammar' . $question->id . '" aria-expanded="false" aria-controls="collapseGrammar' . $question->id . '">
+                                    <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseGrammar' . $question->id . '" aria-expanded="false" aria-controls="collapseGrammar' . $question->id . '">
                                         Grammar feedback
                                     </button>
                                 </h5>
                             </div>
                                             
                             <div id="collapseGrammar' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#collapseGrammar' . $question->id . '">
-                                <div class="card-body">
-                                    <div class="qtype_lcspeech_words">' . $content . '</div>
-                                </div>
+                                <div class="qtype_lcspeech_words">' . $content . '</div>
                             </div>
                         </div>
                     </div>';
@@ -590,28 +626,34 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
     protected function render_vocabulary($result, $question)
     {
-        $content .= '<table class="generaltable generalbox quizreviewsummary">';
-        $content .= '<tbody>';
-        $content .= '<tr><th class="cell" scope="row">Vocabulary complexity</th><td class="cell">' . $result['vocabulary']['metrics']['vocabulary_complexity'] . '</td></tr>';
-        $content .= '</tbody>';
-        $content .= '</table>';
+        $labelStyle = 'comlexity_label_' . $result['vocabulary']['metrics']['vocabulary_complexity'];
+
+        $content = '';
+        $content .= '
+            <div class="feedback-card box-border">
+                <div>
+                    <span class="bold-text">Vocabulary complexity</span>
+                    <span class="' . $labelStyle . '">' . ucwords(strtolower($result['vocabulary']['metrics']['vocabulary_complexity'])) . '</span>
+                </div>
+            </div>
+            ';
+
+
 
         $grammar = '';
 
         $grammar .= '<div id="accordionVocabulary">
-                        <div class="card">
-                            <div class="card-header" id="headingOne">
+                        <div >
+                            <div  id="headingOne">
                                 <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseVocabulary' . $question->id . '" aria-expanded="false" aria-controls="collapseVocabulary' . $question->id . '">
+                                    <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseVocabulary' . $question->id . '" aria-expanded="false" aria-controls="collapseVocabulary' . $question->id . '">
                                     Vocabulary feedback
                                     </button>
                                 </h5>
                             </div>
                                             
                             <div id="collapseVocabulary' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#collapseVocabulary' . $question->id . '">
-                                <div class="card-body">
-                                    <div class="qtype_lcspeech_words">' . $content . '</div>
-                                </div>
+                                <div class="qtype_lcspeech_words">' . $content . '</div>
                             </div>
                         </div>
                     </div>';
@@ -621,15 +663,92 @@ class qtype_lcspeech_renderer extends qtype_renderer
     protected function render_speaking_score($result, $question)
     {
         $feedback = '';
-        $feedback .= '<table class="generaltable generalbox quizreviewsummary">';
+        $feedback .= '<table style="table-layout: fixed ; width: 100%;" class="generaltable generalbox quizreviewsummary metadata-table">';
         $feedback .= '<tbody>';
-        $feedback .= '<tr><th class="cell" scope="row">Overall score</th><td class="cell">' . $result['overall']['english_proficiency_scores']['mock_ielts']['prediction'] . '</td></tr>';
-        $feedback .= '<tr><th class="cell" scope="row">Pronunciation score</th><td class="cell">' . $result['pronunciation']['english_proficiency_scores']['mock_ielts']['prediction'] . '</td></tr>';
-        $feedback .= '<tr><th class="cell" scope="row">Fluency score</th><td class="cell">' . $result['fluency']['english_proficiency_scores']['mock_ielts']['prediction'] . '</td></tr>';
-        if ($question->speechtype == 'unscripted') {
-            $feedback .= '<tr><th class="cell" scope="row">Vocabulary score</th><td class="cell">' . $result['vocabulary']['english_proficiency_scores']['mock_ielts']['prediction'] . '</td></tr>';
-            $feedback .= '<tr><th class="cell" scope="row">Grammar score</th><td class="cell">' . $result['grammar']['english_proficiency_scores']['mock_ielts']['prediction'] . '</td></tr>';
+        $feedback .= '<tr>
+                        <th scope="row">Fluency</th>
+                        <th scope="row">Pronunciation</th>
+                        <th scope="row">Overall</th>
+                    </tr>';
+        $feedback .= '<tr>
+                        <td scope="row">' . $result['fluency']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                        <td scope="row">' . $result['pronunciation']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                        <td scope="row">' . $result['overall']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                    </tr>';
+
+        $feedback .= '</tbody>';
+        $feedback .= '</table>';
+
+        return $feedback;
+    }
+
+    protected function get_config_scoring_option($question)
+    {
+        $global_scoring_opt = get_config('qtype_lcspeech', 'scoringoptionsetting');
+        $scoring_option = !empty($question->scoringoption) ? $question->scoringoption : $global_scoring_opt;
+
+        $config = "";
+        switch ($scoring_option) {
+            case "PTE":
+                $config = "mock_pte";
+                break;
+            case "CEFR":
+                $config = "mock_cefr";
+                break;
+            case "LC":
+                $config = "mock_lc";
+                break;
+            case "IELTS":
+            default:
+                $config = "mock_ielts";
+                break;
         }
+        return $config;
+    }
+
+    protected function get_config_scoring_option_display($question)
+    {
+        $global_scoring_opt = get_config('qtype_lcspeech', 'scoringoptionsetting');
+        $scoring_option = !empty($question->scoringoption) ? $question->scoringoption : $global_scoring_opt;
+
+        $config = "";
+        switch ($scoring_option) {
+            case "PTE":
+                $config = "Mock PTE";
+                break;
+            case "CEFR":
+                $config = "Mock CEFR";
+                break;
+            case "LC":
+                $config = "Mock LC";
+                break;
+            case "IELTS":
+            default:
+                $config = "Mock IELTS";
+                break;
+        }
+        return $config;
+    }
+
+    protected function render_speaking_score_unscripted($result, $question)
+    {
+        $feedback = '';
+        $feedback .= '<table class="generaltable generalbox quizreviewsummary metadata-table">';
+        $feedback .= '<tbody>';
+        $feedback .= '<tr>
+                        <th scope="row">Pronunciation</th>
+                        <th scope="row">Fluency</th>
+                        <th scope="row">Vocabulary</th>
+                        <th scope="row">Grammar</th>
+                        <th scope="row">Overall</th>
+                    </tr>';
+        $feedback .= '<tr>
+                        <td scope="row">' . $result['pronunciation']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                        <td scope="row">' . $result['fluency']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                        <td scope="row">' . $result['vocabulary']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                        <td scope="row">' . $result['grammar']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                        <td scope="row">' . $result['overall']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                    </tr>';
 
         $feedback .= '</tbody>';
         $feedback .= '</table>';

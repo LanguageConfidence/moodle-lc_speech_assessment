@@ -75,4 +75,14 @@ if ($ADMIN->fulltree) {
         get_string('noexpirationaudio_desc', 'qtype_lcspeech'),
         0
     ));
+
+    // Scoring option settings (IELTS, PTE, CEFR, LC)
+    $settings->add(new admin_setting_heading('scoringoptionsetting', get_string('scoringoptionsetting', 'qtype_lcspeech'), ''));
+    $settings->add(new admin_setting_configselect(
+        'qtype_lcspeech/scoringoptionsetting',
+        get_string('scoringoption', 'qtype_lcspeech'),
+        get_string('scoringoption_desc', 'qtype_lcspeech'),
+        'IELTS',
+        array("IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR", "LC" => "LC")
+    ));
 }

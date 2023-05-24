@@ -96,6 +96,14 @@ class qtype_lcspeech_edit_form extends question_edit_form
         $mform->addHelpButton('contextvalidanswerdescription', 'contextvalidanswerdescription', 'qtype_lcspeech');
         $mform->setType('contextvalidanswerdescription', PARAM_TEXT);
 
+        $mform->addElement(
+            'select',
+            'scoringoption',
+            get_string('scoringoption', 'qtype_lcspeech'),
+            array("IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR", "LC" => "LC")
+        );
+        $mform->setDefault('scoringoption', qtype_lcspeech::DEFAULT_SCORING_OPTION);
+
         // Disable context... control when a hascontext dropdown has value '0'.
         $mform->hideIf('hascontext', 'speechtype', 'neq', 'unscripted');
 

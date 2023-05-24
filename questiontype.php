@@ -37,6 +37,8 @@ class qtype_lcspeech extends question_type
     /** @var string default accent. */
     const DEFAULT_SPEECH_ASSESSMENT = 'scripted';
 
+    const DEFAULT_SCORING_OPTION = 'IELTS';
+
     public function response_file_areas()
     {
         return ['recording'];
@@ -45,7 +47,7 @@ class qtype_lcspeech extends question_type
     public function extra_question_fields()
     {
         return array(
-            'qtype_lcspeech_options', 'mediatype', 'speechphrase', 'timelimitinseconds', 'accent', 'speechtype', 'hascontext', 'contextquestion', 'contextdescription', 'contextvalidanswerdescription'
+            'qtype_lcspeech_options', 'mediatype', 'speechphrase', 'timelimitinseconds', 'accent', 'speechtype', 'hascontext', 'contextquestion', 'contextdescription', 'contextvalidanswerdescription', 'scoringoption'
         );
     }
 
@@ -58,6 +60,7 @@ class qtype_lcspeech extends question_type
         $question->mediatype = $questiondata->options->mediatype;
         $question->accent = $questiondata->options->accent;
         $question->speechtype = $questiondata->options->speechtype;
+        $question->scoringoption = $questiondata->options->scoringoption;
         $question->hascontext = $questiondata->options->hascontext;
         $question->contextquestion = $questiondata->options->contextquestion;
         $question->contextdescription = $questiondata->options->contextdescription;
@@ -88,6 +91,8 @@ class qtype_lcspeech extends question_type
             "</timelimitinseconds>\n";
         $output .= '    <speechtype>' . $question->options->speechtype .
             "</speechtype>\n";
+        $output .= '    <scoringoption>' . $question->options->scoringoption .
+            "</scoringoption>\n";
         $output .= '    <hascontext>' . $question->options->hascontext .
             "</hascontext>\n";
         $output .= '    <contextquestion>' . $question->options->contextquestion .

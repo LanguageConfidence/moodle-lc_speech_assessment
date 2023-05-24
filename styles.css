@@ -1,33 +1,44 @@
+.que.lcspeech {
+    font-family: 'Roboto', sans-serif;
+}
+
 .que.lcspeech .audio-widget {
     display: inline-flex;
     margin: 2px 0;
     width: 20em;
     max-width: 100%;
 }
+
 .que.lcspeech .audio-widget .no-recording-placeholder {
     flex-grow: 1;
     padding-top: 0.45em;
 }
+
 .que.lcspeech .audio-widget .media-player {
     flex-grow: 1;
 }
+
 .que.lcspeech .audio-widget .media-player audio {
     height: 2.437em;
     vertical-align: -0.8em;
     width: 100%;
     max-width: 100%;
 }
+
 .que.lcspeech .audio-widget .record-button {
     margin-left: 4px;
 }
+
 .que.lcspeech .audio-widget button {
     white-space: nowrap;
     margin-right: 0;
 }
+
 .que.lcspeech .audio-widget a {
     white-space: nowrap;
     line-height: 2.437em;
 }
+
 .que.lcspeech .audio-widget .download-icon {
     vertical-align: middle;
     margin-right: 2px;
@@ -43,6 +54,7 @@
     background-color: #f0f0f1;
     text-align: center;
 }
+
 .que.lcspeech .download-icon {
     height: 28px;
     width: 28px;
@@ -58,8 +70,9 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
 }
 
 .que.lcspeech .qtype_lcspeech_average_score {
-    font-size: 1.5rem;
-    font-weight: bold;
+    color: #212529;
+    margin: 19px 0 19px 0;
+    /* font-weight: bold; */
 }
 
 .que.lcspeech .qtype_lcspeech_words {
@@ -71,9 +84,11 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     margin-right: 2rem;
     margin-bottom: 1rem;
     padding: 1rem;
-    background-color: white;
+    background-color: #fff;
     border-radius: 5px;
-    box-shadow: 2px 2px 3px 3px #ccc;
+    text-align: center;
+    border: 1px solid #e9ecef;
+    color: black;
 }
 
 .que.lcspeech .qtype_lcspeech_word_label {
@@ -100,20 +115,19 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     color: white;
     font-size: 1.5rem;
     font-weight: bold;
-    border-radius: 5px;
     text-align: center;
 }
 
 .que.lcspeech .qtype_lcspeech_phoneme_label_red {
-    background-color: red;
+    background-color: #F0776D;
 }
 
 .que.lcspeech .qtype_lcspeech_phoneme_label_orange {
-    background-color: orange;
+    background-color: #F2BF3B;
 }
 
 .que.lcspeech .qtype_lcspeech_phoneme_label_green {
-    background-color: green;
+    background-color: #599F44;
 }
 
 .que.lcspeech .qtype_lcspeech_phoneme_score {
@@ -125,7 +139,8 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     display: inline-block;
 }
 
-.custom-feedback-range input, .custom-feedback-range span {
+.custom-feedback-range input,
+.custom-feedback-range span {
     width: 100% !important;
 }
 
@@ -144,14 +159,14 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     margin: 0 10px;
 }
 
-.custom-feedback-range + label.accesshide {
+.custom-feedback-range+label.accesshide {
     position: relative;
     height: auto;
     width: auto;
     padding: 0 10px;
 }
 
-.correction-audio-select{
+.correction-audio-select {
     padding-bottom: 20px;
 }
 
@@ -159,8 +174,7 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     margin: 0 !important;
 }
 
-p.note
-{
+p.note {
     background-color: #f0f7fb;
     border-left: solid 4px #3498db;
     line-height: 18px;
@@ -172,29 +186,27 @@ p.note
 }
 
 .cbtn {
-    width: 100%!important;
-    text-align: left!important;
-    position: relative!important;
-    padding: 5px 25px 5px 0!important;
+    width: 100% !important;
+    text-align: left !important;
+    position: relative !important;
+    padding: 5px 25px 5px 0 !important;
     color: #000000 !important;
+    display: flex !important;
+    align-items: center;
 }
 
-.cbtn:after
-{
+.cbtn:before {
     content: '' !important;
     display: block !important;
-    position: absolute!important;
-    top: 10px!important;
-    right:10px!important;
-    width: 10px!important;
-    height: 10px!important;
-    border-left: 1px solid #000000;
-    border-bottom: 1px solid #000000;
+    width: 10px !important;
+    height: 10px !important;
+    border-left: 3px solid #000000;
+    border-bottom: 3px solid #000000;
     transform: rotate(315deg);
+    margin: 0 10px 4px 1px;
 }
 
-.cbtn[aria-expanded="true"]:after
-{
+.cbtn[aria-expanded="true"]:after {
     transform: rotate(135deg);
 }
 
@@ -229,4 +241,112 @@ p.note
 .fb-title-container {
     border-bottom: 1px solid #00000040;
     margin-bottom: 10px;
+}
+
+.que.lcspeech .metadata-card {
+    border-left: 3px #0056B3 solid !important;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.que.lcspeech .metadata-card div:nth-child(1) {
+    margin-bottom: 10px;
+}
+
+.que.lcspeech .metadata-card div:nth-child(2) {
+    color: #212529;
+    background-color: #F8F9FA;
+    padding: 12px;
+}
+
+.que.lcspeech .feedback-card {
+    border-left: 3px #0056B3 solid !important;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.que.lcspeech .feedback-card div:nth-child(1) {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.que.lcspeech .feedback-card div:nth-child(1) span:nth-child(2) {
+    color: #0056B3;
+    font-weight: bold;
+}
+
+.que.lcspeech .feedback-card div:nth-child(2) {
+    color: #212529;
+    background-color: #F8F9FA;
+    margin-top: 10px;
+    padding: 12px;
+}
+
+.metadata-table {
+    font-size: 15px;
+}
+
+.metadata-table th {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+
+}
+
+.metadata-table th:nth-last-child(-n+1) {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+    color: #0056B3;
+}
+
+.metadata-table td {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+    font-weight: bold;
+}
+
+.metadata-table td:nth-last-child(-n+1) {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+    font-weight: bold;
+    color: #0056B3;
+}
+
+.que.lcspeech .section-header {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.que.lcspeech .comlexity_label_COMPLEX {
+    background-color: #CA3120;
+    color: white !important;
+    padding: 2px 8px 2px 8px;
+    border-radius: 15px;
+    font-weight: normal !important;
+}
+
+.que.lcspeech .comlexity_label_AVERAGE {
+    background-color: #F0AD4E;
+    color: white !important;
+    padding: 2px 8px 2px 8px;
+    border-radius: 15px;
+    font-weight: normal !important;
+}
+
+.que.lcspeech .comlexity_label_SIMPLE {
+    background-color: #357A32;
+    color: white !important;
+    padding: 2px 8px 2px 8px;
+    border-radius: 15px;
+    font-weight: normal !important;
+}
+
+.que.lcspeech .box-border {
+    border: 1px solid #DEE2E6;
+    border-radius: 5px;
+}
+
+.que.lcspeech .bold-text {
+    font-weight: bold;
+    color: #212529
 }

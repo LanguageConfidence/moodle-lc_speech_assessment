@@ -14,6 +14,7 @@
         <FIELD NAME="contextquestion" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="contextdescription" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="contextvalidanswerdescription" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="scoringoption" TYPE="char" LENGTH="15" NOTNULL="false" DEFAULT="IELTS" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id" COMMENT="Primary key for Moodle question/type/lcspeech"/>
