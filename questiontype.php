@@ -37,7 +37,7 @@ class qtype_lcspeech extends question_type
     /** @var string default accent. */
     const DEFAULT_SPEECH_ASSESSMENT = 'scripted';
 
-    const DEFAULT_SCORING_OPTION = 'IELTS';
+    const DEFAULT_SCORING_OPTION = 'DEFAULT';
 
     public function response_file_areas()
     {

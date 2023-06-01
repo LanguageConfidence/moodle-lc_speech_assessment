@@ -670,11 +670,20 @@ class qtype_lcspeech_renderer extends qtype_renderer
                         <th scope="row">Pronunciation</th>
                         <th scope="row">Overall</th>
                     </tr>';
-        $feedback .= '<tr>
-                        <td scope="row">' . $result['fluency']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                        <td scope="row">' . $result['pronunciation']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                        <td scope="row">' . $result['overall']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                    </tr>';
+        if ($this->get_config_scoring_option($question) == 'DEFAULT') {
+            $feedback .= '<tr>
+                <td scope="row">' . $result['fluency']['overall_score'] . '</td>
+                <td scope="row">' . $result['pronunciation']['overall_score'] . '</td>
+                <td scope="row">' . $result['overall']['overall_score'] . '</td>
+            </tr>';
+        } else {
+            $feedback .= '<tr>
+                <td scope="row">' . $result['fluency']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                <td scope="row">' . $result['pronunciation']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                <td scope="row">' . $result['overall']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+            </tr>';
+        }
+
 
         $feedback .= '</tbody>';
         $feedback .= '</table>';
@@ -695,12 +704,12 @@ class qtype_lcspeech_renderer extends qtype_renderer
             case "CEFR":
                 $config = "mock_cefr";
                 break;
-            case "LC":
-                $config = "mock_lc";
-                break;
             case "IELTS":
-            default:
                 $config = "mock_ielts";
+                break;
+            case "DEFAULT":
+            default:
+                $config = "DEFAULT";
                 break;
         }
         return $config;
@@ -719,12 +728,12 @@ class qtype_lcspeech_renderer extends qtype_renderer
             case "CEFR":
                 $config = "Mock CEFR";
                 break;
-            case "LC":
-                $config = "Mock LC";
-                break;
             case "IELTS":
-            default:
                 $config = "Mock IELTS";
+                break;
+            case "LC":
+            default:
+                $config = "";
                 break;
         }
         return $config;
@@ -742,13 +751,23 @@ class qtype_lcspeech_renderer extends qtype_renderer
                         <th scope="row">Grammar</th>
                         <th scope="row">Overall</th>
                     </tr>';
-        $feedback .= '<tr>
-                        <td scope="row">' . $result['pronunciation']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                        <td scope="row">' . $result['fluency']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                        <td scope="row">' . $result['vocabulary']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                        <td scope="row">' . $result['grammar']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                        <td scope="row">' . $result['overall']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                    </tr>';
+        if ($this->get_config_scoring_option($question) == 'DEFAULT') {
+            $feedback .= '<tr>
+                <td scope="row">' . $result['pronunciation']['overall_score'] . '</td>
+                <td scope="row">' . $result['fluency']['overall_score'] . '</td>
+                <td scope="row">' . $result['vocabulary']['overall_score'] . '</td>
+                <td scope="row">' . $result['grammar']['overall_score'] . '</td>
+                <td scope="row">' . $result['overall']['overall_score'] . '</td>
+            </tr>';
+        } else {
+            $feedback .= '<tr>
+                <td scope="row">' . $result['pronunciation']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                <td scope="row">' . $result['fluency']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                <td scope="row">' . $result['vocabulary']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                <td scope="row">' . $result['grammar']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
+                <td scope="row">' . $result['overall']['overall_score'] . '</td>
+            </tr>';
+        }
 
         $feedback .= '</tbody>';
         $feedback .= '</table>';

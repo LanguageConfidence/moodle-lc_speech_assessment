@@ -82,7 +82,7 @@ if ($ADMIN->fulltree) {
         'qtype_lcspeech/scoringoptionsetting',
         get_string('scoringoption', 'qtype_lcspeech'),
         get_string('scoringoption_desc', 'qtype_lcspeech'),
-        'IELTS',
-        array("IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR", "LC" => "LC")
+        'DEFAULT',
+        array("DEFAULT" => "DEFAULT", "IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
     ));
 }

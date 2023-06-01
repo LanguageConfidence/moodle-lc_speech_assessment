@@ -350,3 +350,10 @@ p.note {
     font-weight: bold;
     color: #212529
 }
+
+.speaking-score-mock {
+    float: right;
+    color: black;
+    font-size: 14px;
+    padding-top: 10px;
+}

@@ -100,7 +100,7 @@ class qtype_lcspeech_edit_form extends question_edit_form
             'select',
             'scoringoption',
             get_string('scoringoption', 'qtype_lcspeech'),
-            array("IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR", "LC" => "LC")
+            array("DEFAULT" => "DEFAULT", "IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
         );
         $mform->setDefault('scoringoption', qtype_lcspeech::DEFAULT_SCORING_OPTION);
 
