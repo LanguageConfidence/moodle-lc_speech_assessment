@@ -39,6 +39,8 @@ class qtype_lcspeech extends question_type
 
     const DEFAULT_SCORING_OPTION = 'DEFAULT';
 
+    const IELTS_SCORING_OPTION = 'IELTS';
+
     public function response_file_areas()
     {
         return ['recording'];

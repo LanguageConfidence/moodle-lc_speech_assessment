@@ -336,7 +336,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 // Speaking score
                 $all_feedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
                 $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
-                $speakingscore = $this->render_speaking_score($result, $question);
+                $speakingscore = $this->render_speaking_score_scripted($result, $question);
                 $all_feedback .= $speakingscore;
 
                 // Metadata - Content Relevance
@@ -425,7 +425,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
                 $feedbackPronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
 
-                // Speaking score
+                // Speaking score unscripted
                 $all_feedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
                 $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score_unscripted($result, $question);
@@ -434,21 +434,20 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 // Metadata - Content Relevance
                 $metadata = $this->render_metadata($result, $question);
                 $all_feedback .= '</div><div id="accordion">
-                                      <div>
+                                        <div>
                                         <div id="headingOne">
-                                          <h5 class="mb-0">
+                                            <h5 class="mb-0">
                                             <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
                                                 Content relevance
                                             </button>
-                                          </h5>
+                                            </h5>
                                         </div>
                                     
                                         <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                                             <div class="qtype_lcspeech_words">' . $metadata . '</div>
                                         </div>
-                                      </div>
+                                        </div>
                                     </div>';
-
                 $all_feedback .= '<div>';
 
                 $pronunciation_feedback .= '<div id="accordion">
@@ -475,8 +474,10 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $all_feedback .= $fluencyFeedback;
 
                 // Grammar
-                $grammar = $this->render_grammar($result, $question);
-                $all_feedback .= $grammar;
+                if (isset($result['grammar']['metrics']['mistake_count']) || isset($result['grammar']['metrics']['grammatical_complexity'])) {
+                    $grammar = $this->render_grammar($result, $question);
+                    $all_feedback .= $grammar;
+                }
 
                 // vocabulary 
                 $vocabulary = $this->render_vocabulary($result, $question);
@@ -490,8 +491,83 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return '';
     }
 
+    protected function formatted_fluency_feedback_transcript($tagged)
+    {
+        // replace \" -> '
+        $fTaggged = "<discourse-marker description=\"test\"></discourse-marker>" . $tagged;
+        $fTaggged = str_replace("\"", "'", $fTaggged);
+        // filler-word
+        // $fTaggged = str_replace("filler-word", "filler-word filler-word='filler word'", $tagged);
+        // word-repetition
+        // $fTaggged = str_replace("word-repetition", "word-repetition word-repetition='word repetition'", $tagged);
+        // <i class="icon fa fa-clock-o" aria-hidden="true"></i>
+        $fTaggged = str_replace("</speech-pause>", "[pause]</speech-pause> ", $fTaggged);
+
+        // echo  $fTaggged;
+        return $fTaggged;
+    }
+
+    protected function fluency_feedback_transcript_append_child($dom, $nodes, $title, $content)
+    {
+        foreach ($nodes as $d) {
+            switch ($title) {
+                case 'Connective':
+                    $vMakers = $d->attributes->item(0)->value;
+                    $content = "Used for: " . $vMakers;
+                    break;
+                case 'Speech pause':
+                    $vMakers = $d->attributes->item(0)->value;
+                    $content = "Duration seconds: " . $vMakers;
+                    break;
+                default:
+                    break;
+            }
+
+            $nodeSpan = $dom->createElement("span");
+            $nodeDiv1 = $dom->createElement("p", $title);
+            $nodeDiv1->setAttribute("class", "t-title");
+            $nodeDiv2 = $dom->createElement("p", $content);
+            $nodeDiv2->setAttribute("class", "t-content");
+            $nodeSpan->appendChild($nodeDiv1);
+            $nodeSpan->appendChild($nodeDiv2);
+            $d->appendChild($nodeSpan);
+            $d->setAttribute("class", "t-tooltips");
+        }
+    }
+
+    protected function build_fluency_feedback_transcript($html)
+    {
+        // $html = "Well, this is a very good test. The test is about English <discourse-marker description=\"adding information\">and</discourse-marker> specifically about IELTS test. <speech-pause duration_seconds=\"2.0\"></speech-pause><discourse-marker description=\"contrasting\">However</discourse-marker>, it is, <filler-word>uh</filler-word>, more <word-repetition>like like</word-repetition> a mock test. Which is not referring to your actual results, but it can only refer to your practice results <discourse-marker description=\"indicating purpose\">in order to</discourse-marker> <word-repetition>prepare for you prepare for you</word-repetition>, <filler-word>uh</filler-word>, before the test";
+        $taggedFeedback = $this->formatted_fluency_feedback_transcript($html);
+        $dom = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $dom->loadHTML($taggedFeedback);
+        $discourseMarkers = $dom->getElementsByTagName("discourse-marker");
+        $this->fluency_feedback_transcript_append_child($dom, $discourseMarkers, "Connective", null);
+
+        $fillerWord = $dom->getElementsByTagName("filler-word");
+        $this->fluency_feedback_transcript_append_child($dom, $fillerWord, "Filler word", "Used for: filler word");
+
+        $wordRepetition = $dom->getElementsByTagName("word-repetition");
+        $this->fluency_feedback_transcript_append_child($dom, $wordRepetition, "Word repetition", "Used for: Word repetition");
+
+        $speechPause = $dom->getElementsByTagName("speech-pause");
+        $this->fluency_feedback_transcript_append_child($dom, $speechPause, "Speech pause", null);
+
+        return $dom->saveHTML();
+    }
+
+
     protected function feedback_fluency($response, $question)
     {
+        $taggedFeedback = $response['fluency']['feedback']['tagged_transcript'];
+        // $taggedFeedback = "Well, this is a very good test. The test is about English <discourse-marker description=\"adding information\">and</discourse-marker> specifically about IELTS test. <speech-pause duration_seconds=\"2.0\"></speech-pause><discourse-marker description=\"contrasting\">However</discourse-marker>, it is, <filler-word>uh</filler-word>, more <word-repetition>like like</word-repetition> a mock test. Which is not referring to your actual results, but it can only refer to your practice results <discourse-marker description=\"indicating purpose\">in order to</discourse-marker> <word-repetition>prepare for you prepare for you</word-repetition>, <filler-word>uh</filler-word>, before the test";
+        $iConnective = substr_count($taggedFeedback, '</discourse-marker>');
+        $iFillerWord = substr_count($taggedFeedback, '</filler-word>');
+        $iWordRepetition = substr_count($taggedFeedback, '</word-repetition>');
+        $iSpeechPause = substr_count($taggedFeedback, '</speech-pause>');
+
+        $taggedFeedback = $this->build_fluency_feedback_transcript($taggedFeedback);
         $content = '
             <div class="feedback-card box-border">
                 <div>
@@ -514,7 +590,26 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 </div>
                 <div>' . $response['fluency']['feedback']['filler_words']['feedback_text'] . '</div>
             </div>
-            
+            <div class="feedback-card box-border">
+                <div >
+                    <span class="bold-text">Tagged transcript</span>
+                    <div style="margin-top: 0px;">
+                        <div style="display: contents;margin-right: 5px;">
+                            <div class="c-feedback discourse-marker">' . $iConnective . '</div> Connectives&nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+                        <div style="display: contents;margin-right: 5px;">
+                            <div class="c-feedback word-repetition">' . $iFillerWord . '</div> Word repetitions&nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+                        <div style="display: contents;margin-right: 5px;">
+                            <div class="c-feedback filler-word">' . $iWordRepetition . '</div> Filler word&nbsp;&nbsp;&nbsp;&nbsp;
+                        </div>
+                        <div style="display: contents;">
+                            <div class="c-feedback speech-pause">' . $iSpeechPause . '</div> Pauses
+                        </div>
+                    </div>
+                </div>
+                <div>' . $taggedFeedback . '</div>
+            </div>
         ';
 
         $feedback = '';
@@ -560,15 +655,24 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
         if ($question->speechtype == 'unscripted') {
             $content = '
-                <div class="metadata-card box-border">
-                    <div><span class="bold-text">Predicted text</span></div>
+                <div class="feedback-card box-border">
+                    <div><span class="bold-text">The predicted text</span></div>
                     <div>' . $response['metadata']['predicted_text'] . '</div>
                 </div>
-                <div class="metadata-card box-border">
-                    <div><span class="bold-text">Expected text</span></div>
-                    <div>' . $response['metadata']['content_relevance'] . '</div>
-                </div>
             ';
+
+            if (isset($response['metadata']['content_relevance']) && isset($response['metadata']['content_relevance_feedback'])) {
+                $labelStyle = 'comlexity_label_' . $response['metadata']['content_relevance'];
+                $content .= '
+                    <div class="feedback-card box-border">
+                        <div>
+                            <span class="bold-text">Unscripted content relevance score</span>
+                            <span class="' . $labelStyle . '">' . ucwords(strtolower(str_replace("_", " ", $response['metadata']['content_relevance']))) . '</span>
+                        </div>
+                        <div>' . $response['metadata']['content_relevance_feedback'] . '</div>
+                    </div>
+                ';
+            }
 
             if (isset($response['metadata']['valid_answer'])) {
                 $valid_answer = str_replace('_', ' ', $response['metadata']['valid_answer']);
@@ -589,38 +693,47 @@ class qtype_lcspeech_renderer extends qtype_renderer
     {
         $labelStyle = 'comlexity_label_' . $result['grammar']['metrics']['grammatical_complexity'];
         $content = '';
-        $content .= '
-            <div class="feedback-card box-border">
-                <div>
-                    <span class="bold-text">Grammar mistake count</span>
-                    <span>' . $result['grammar']['metrics']['mistake_count'] . '</span>
+        if (isset($result['grammar']['metrics']['mistake_count'])) {
+            $content .= '
+                <div class="feedback-card box-border">
+                    <div>
+                        <span class="bold-text">Grammar mistake count</span>
+                        <span>' . $result['grammar']['metrics']['mistake_count'] . '</span>
+                    </div>
                 </div>
-            </div>
-            <div class="feedback-card box-border">
-                <div>
-                    <span class="bold-text">Grammatical complexity</span>
-                    <span class="' . $labelStyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
+                ';
+        }
+
+        if (isset($result['grammar']['metrics']['grammatical_complexity'])) {
+            $content .= '
+                <div class="feedback-card box-border">
+                    <div>
+                        <span class="bold-text">Grammatical complexity</span>
+                        <span class="' . $labelStyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
+                    </div>
                 </div>
-            </div>
-            ';
+                ';
+        }
 
         $grammar = '';
 
-        $grammar .= '<div id="accordionGrammar">
-                        <div >
-                            <div  id="headingOne">
-                                <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseGrammar' . $question->id . '" aria-expanded="false" aria-controls="collapseGrammar' . $question->id . '">
-                                        Grammar feedback
-                                    </button>
-                                </h5>
-                            </div>
-                                            
-                            <div id="collapseGrammar' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#collapseGrammar' . $question->id . '">
-                                <div class="qtype_lcspeech_words">' . $content . '</div>
-                            </div>
-                        </div>
-                    </div>';
+        if (!empty($content)) {
+            $grammar .= '<div id="accordionGrammar">
+                <div >
+                    <div  id="headingOne">
+                        <h5 class="mb-0">
+                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseGrammar' . $question->id . '" aria-expanded="false" aria-controls="collapseGrammar' . $question->id . '">
+                                Grammar feedback
+                            </button>
+                        </h5>
+                    </div>
+                                    
+                    <div id="collapseGrammar' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#collapseGrammar' . $question->id . '">
+                        <div class="qtype_lcspeech_words">' . $content . '</div>
+                    </div>
+                </div>
+            </div>';
+        }
         return $grammar;
     }
 
@@ -638,10 +751,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
             </div>
             ';
 
-
-
         $grammar = '';
-
         $grammar .= '<div id="accordionVocabulary">
                         <div >
                             <div  id="headingOne">
@@ -660,7 +770,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $grammar;
     }
 
-    protected function render_speaking_score($result, $question)
+    protected function render_speaking_score_scripted($result, $question)
     {
         $feedback = '';
         $feedback .= '<table style="table-layout: fixed ; width: 100%;" class="generaltable generalbox quizreviewsummary metadata-table">';
@@ -742,31 +852,45 @@ class qtype_lcspeech_renderer extends qtype_renderer
     protected function render_speaking_score_unscripted($result, $question)
     {
         $feedback = '';
-        $feedback .= '<table class="generaltable generalbox quizreviewsummary metadata-table">';
+        $feedback .= '<table class="generaltable generalbox quizreviewsummary unscript-speaking-table">';
         $feedback .= '<tbody>';
         $feedback .= '<tr>
                         <th scope="row">Pronunciation</th>
                         <th scope="row">Fluency</th>
                         <th scope="row">Vocabulary</th>
                         <th scope="row">Grammar</th>
-                        <th scope="row">Overall</th>
-                    </tr>';
+                    ';
+        if (isset($result['overall']['overall_score'])) {
+            $feedback .= '<th scope="row" class="txt-last">Overall</th>';
+        }
+        $feedback .= '</tr>';
+
         if ($this->get_config_scoring_option($question) == 'DEFAULT') {
             $feedback .= '<tr>
                 <td scope="row">' . $result['pronunciation']['overall_score'] . '</td>
                 <td scope="row">' . $result['fluency']['overall_score'] . '</td>
                 <td scope="row">' . $result['vocabulary']['overall_score'] . '</td>
                 <td scope="row">' . $result['grammar']['overall_score'] . '</td>
-                <td scope="row">' . $result['overall']['overall_score'] . '</td>
-            </tr>';
+            ';
+
+            if (isset($result['overall']['overall_score'])) {
+                $feedback .= '<td scope="row" class="txt-last">' . $result['overall']['overall_score'] . '</td>';
+            }
+
+            $feedback .= '</tr>';
         } else {
             $feedback .= '<tr>
                 <td scope="row">' . $result['pronunciation']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
                 <td scope="row">' . $result['fluency']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
                 <td scope="row">' . $result['vocabulary']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
                 <td scope="row">' . $result['grammar']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
-                <td scope="row">' . $result['overall']['overall_score'] . '</td>
-            </tr>';
+            ';
+
+            if (isset($result['overall']['overall_score'])) {
+                $feedback .= '<td scope="row">' . $result['overall']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>';
+            }
+
+            $feedback .= '</tr>';
         }
 
         $feedback .= '</tbody>';

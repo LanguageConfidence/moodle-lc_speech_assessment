@@ -59,57 +59,73 @@ class qtype_lcspeech_edit_form extends question_edit_form
             array('maxlength' => 1000, 'size' => 100)
         );
         $mform->addHelpButton('speechphrase', 'speechphrase', 'qtype_lcspeech');
-        $mform->addRule('speechphrase', null, 'required', null, 'client');
+        // $mform->addRule('speechphrase', null, 'required', null, 'client');
         $mform->setType('speechphrase', PARAM_TEXT);
+        $mform->hideIf('speechphrase', 'speechtype', 'eq', 'unscripted');
 
         // checkbox has content relevance
         // $mform->addElement('advcheckbox', 'hascontext', get_string('has_content_relevance', 'qtype_lcspeech'));
-        $mform->addElement('selectyesno', 'hascontext', get_string('has_content_relevance', 'qtype_lcspeech'));
+        if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+            $mform->addElement('selectyesno', 'hascontext', get_string('has_content_relevance', 'qtype_lcspeech'));
 
-        // context question
-        $mform->addElement(
-            'text',
-            'contextquestion',
-            get_string('contextquestion', 'qtype_lcspeech'),
-            array('maxlength' => 1000, 'size' => 100)
-        );
-        $mform->addHelpButton('contextquestion', 'contextquestion', 'qtype_lcspeech');
-        $mform->setType('contextquestion', PARAM_TEXT);
+            // context question
+            $mform->addElement(
+                'text',
+                'contextquestion',
+                get_string('contextquestion', 'qtype_lcspeech'),
+                array('maxlength' => 1000, 'size' => 100)
+            );
+            $mform->addHelpButton('contextquestion', 'contextquestion', 'qtype_lcspeech');
+            $mform->setType('contextquestion', PARAM_TEXT);
 
-        // context description
-        $mform->addElement(
-            'text',
-            'contextdescription',
-            get_string('contextdescription', 'qtype_lcspeech'),
-            array('maxlength' => 1000, 'size' => 100)
-        );
-        $mform->addHelpButton('contextdescription', 'contextdescription', 'qtype_lcspeech');
-        $mform->setType('contextdescription', PARAM_TEXT);
+            // context description
+            $mform->addElement(
+                'text',
+                'contextdescription',
+                get_string('contextdescription', 'qtype_lcspeech'),
+                array('maxlength' => 1000, 'size' => 100)
+            );
+            $mform->addHelpButton('contextdescription', 'contextdescription', 'qtype_lcspeech');
+            $mform->setType('contextdescription', PARAM_TEXT);
 
-        // valid_answer_description
-        $mform->addElement(
-            'text',
-            'contextvalidanswerdescription',
-            get_string('contextvalidanswerdescription', 'qtype_lcspeech'),
-            array('maxlength' => 1000, 'size' => 100)
-        );
-        $mform->addHelpButton('contextvalidanswerdescription', 'contextvalidanswerdescription', 'qtype_lcspeech');
-        $mform->setType('contextvalidanswerdescription', PARAM_TEXT);
+            // valid_answer_description
+            $mform->addElement(
+                'text',
+                'contextvalidanswerdescription',
+                get_string('contextvalidanswerdescription', 'qtype_lcspeech'),
+                array('maxlength' => 1000, 'size' => 100)
+            );
+            $mform->addHelpButton('contextvalidanswerdescription', 'contextvalidanswerdescription', 'qtype_lcspeech');
+            $mform->setType('contextvalidanswerdescription', PARAM_TEXT);
+        }
 
-        $mform->addElement(
-            'select',
-            'scoringoption',
-            get_string('scoringoption', 'qtype_lcspeech'),
-            array("DEFAULT" => "DEFAULT", "IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
-        );
-        $mform->setDefault('scoringoption', qtype_lcspeech::DEFAULT_SCORING_OPTION);
+        // scoring option
+        if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+            $mform->addElement(
+                'select',
+                'scoringoption',
+                get_string('scoringoption', 'qtype_lcspeech'),
+                array("DEFAULT" => "DEFAULT", "IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
+            );
+            $mform->setDefault('scoringoption', qtype_lcspeech::DEFAULT_SCORING_OPTION);
+        } else {
+            $mform->addElement(
+                'select',
+                'scoringoption',
+                get_string('scoringoption', 'qtype_lcspeech'),
+                array("IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
+            );
+            $mform->setDefault('scoringoption', qtype_lcspeech::IELTS_SCORING_OPTION);
+        }
 
-        // Disable context... control when a hascontext dropdown has value '0'.
-        $mform->hideIf('hascontext', 'speechtype', 'neq', 'unscripted');
+        if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+            // Disable context... control when a hascontext dropdown has value '0'.
+            $mform->hideIf('hascontext', 'speechtype', 'neq', 'unscripted');
 
-        $mform->hideIf('contextquestion', 'hascontext', '0');
-        $mform->hideIf('contextdescription', 'hascontext', '0');
-        $mform->hideIf('contextvalidanswerdescription', 'hascontext', '0');
+            $mform->hideIf('contextquestion', 'hascontext', '0');
+            $mform->hideIf('contextdescription', 'hascontext', '0');
+            $mform->hideIf('contextvalidanswerdescription', 'hascontext', '0');
+        }
 
         $this::hideFeedbackAndAudio($mform);
         // process case Edit

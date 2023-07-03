@@ -241,9 +241,12 @@ class qtype_lcspeech_question extends question_graded_automatically
         $header = array(
             'Content-Type: application/json',
             'x-blobr-key: ' . $api_key,
-            'x-user-id:' . $USER->id,
-            'lc-beta-features: true'
+            'x-user-id:' . $USER->id
         );
+        // check setting lc-beta-features
+        if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+            array_push($header, 'lc-beta-features: true');
+        }
 
         $postdata = json_encode($payload);
         $ch = curl_init($endpoint);

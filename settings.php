@@ -76,6 +76,12 @@ if ($ADMIN->fulltree) {
         0
     ));
 
+    $settings->add(new admin_setting_configcheckbox(
+        'qtype_lcspeech/enablelcbetafeatures',
+        get_string('enablelcbetafeatures', 'qtype_lcspeech'),
+        get_string('enablelcbetafeatures_desc', 'qtype_lcspeech'),
+        0
+    ));
     // Scoring option settings (IELTS, PTE, CEFR, LC)
     $settings->add(new admin_setting_heading('scoringoptionsetting', get_string('scoringoptionsetting', 'qtype_lcspeech'), ''));
     $settings->add(new admin_setting_configselect(

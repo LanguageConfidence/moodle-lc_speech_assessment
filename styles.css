@@ -333,6 +333,39 @@ p.note {
     font-weight: normal !important;
 }
 
+
+.que.lcspeech .comlexity_label_RELEVANT {
+    background-color: #357A32;
+    color: white !important;
+    padding: 2px 8px 2px 8px;
+    border-radius: 15px;
+    font-weight: normal !important;
+}
+
+.que.lcspeech .comlexity_label_PARTIALLY_RELEVANT {
+    background-color: #F0AD4E;
+    color: white !important;
+    padding: 2px 8px 2px 8px;
+    border-radius: 15px;
+    font-weight: normal !important;
+}
+
+.que.lcspeech .comlexity_label_NO_RELEVANT {
+    background-color: #CA3120;
+    color: white !important;
+    padding: 2px 8px 2px 8px;
+    border-radius: 15px;
+    font-weight: normal !important;
+}
+
+.que.lcspeech .comlexity_label_NOT_RELEVANT {
+    background-color: #CA3120;
+    color: white !important;
+    padding: 2px 8px 2px 8px;
+    border-radius: 15px;
+    font-weight: normal !important;
+}
+
 .que.lcspeech .comlexity_label_SIMPLE {
     background-color: #357A32;
     color: white !important;
@@ -356,4 +389,108 @@ p.note {
     color: black;
     font-size: 14px;
     padding-top: 10px;
+}
+
+/* fluency feedbacl transcript*/
+.c-feedback {
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    color: black;
+    text-align: center;
+    font: 14px Arial, sans-serif;
+    line-height: 21px;
+    font-weight: bold;
+    display: inline-block !important;
+    margin-right: 10px;
+}
+.discourse-marker {
+	background: #CDD7FF;
+}
+.word-repetition {
+	background: #AEF3FE;
+}
+.filler-word {
+	background: #FDDBB2;
+}
+.speech-pause {
+	background: #FFD3D9;
+}
+
+discourse-marker {
+	background: #CDD7FF;
+    position: relative;
+}
+word-repetition {
+	background: #AEF3FE;
+    position: relative;
+}
+filler-word {
+	background: #FDDBB2;
+    position: relative;
+}
+speech-pause {
+	background: #FFD3D9;
+    position: relative;
+}
+
+.t-tooltips span {
+  display: none;
+  left: 0;
+}
+
+.t-tooltips:hover span {
+  display: block;
+  position: absolute;
+  bottom: 1.5em;
+  padding: 0.5em;
+  color: #000000;
+  background: #ffffff;
+  border: 0.1em solid #80808026;
+  border-radius: 0.5em;
+  max-width: 30em;
+  min-width: 14em;
+  box-shadow: 5px 5px 5px #80808052;
+}
+
+.t-tooltips span .t-title {
+	padding: 5px 0px 0px 10px;
+	color: #637381;
+	line-height: 150%;
+	font-weight: 400;
+}
+
+.t-tooltips span .t-content {
+    padding: 5px 0px 5px 10px;
+    line-height: 150%;
+    font-weight: bold;
+}
+
+.unscript-speaking-table {
+    font-size: 15px;
+}
+
+.unscript-speaking-table th {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+
+}
+
+.unscript-speaking-table th.txt-last {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+    color: #0056B3;
+}
+
+.unscript-speaking-table td {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+    font-weight: bold;
+}
+
+.unscript-speaking-table td.txt-last {
+    border: 1px solid #DEE2E6;
+    text-align: center;
+    font-weight: bold;
+    color: #0056B3;
 }
