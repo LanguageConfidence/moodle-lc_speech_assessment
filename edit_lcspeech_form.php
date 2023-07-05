@@ -100,23 +100,13 @@ class qtype_lcspeech_edit_form extends question_edit_form
         }
 
         // scoring option
-        if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
-            $mform->addElement(
-                'select',
-                'scoringoption',
-                get_string('scoringoption', 'qtype_lcspeech'),
-                array("DEFAULT" => "DEFAULT", "IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
-            );
-            $mform->setDefault('scoringoption', qtype_lcspeech::DEFAULT_SCORING_OPTION);
-        } else {
-            $mform->addElement(
-                'select',
-                'scoringoption',
-                get_string('scoringoption', 'qtype_lcspeech'),
-                array("IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
-            );
-            $mform->setDefault('scoringoption', qtype_lcspeech::IELTS_SCORING_OPTION);
-        }
+        $mform->addElement(
+            'select',
+            'scoringoption',
+            get_string('scoringoption', 'qtype_lcspeech'),
+            array("DEFAULT" => "DEFAULT", "IELTS" => "IELTS", "PTE" => "PTE", "CEFR" => "CEFR")
+        );
+        $mform->setDefault('scoringoption', qtype_lcspeech::DEFAULT_SCORING_OPTION);
 
         if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
             // Disable context... control when a hascontext dropdown has value '0'.

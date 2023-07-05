@@ -102,5 +102,5 @@ $string['contextvalidanswerdescription_help'] = 'Context valid answer descriptio
 $string['scoringoptionsetting'] = 'Scoring option settings';
 $string['scoringoption'] = 'Scoring option';
 $string['scoringoption_desc'] = 'LC Scoring option';
-$string['enablelcbetafeatures'] = 'Enable LC beta features';
-$string['enablelcbetafeatures_desc'] = 'Enable LC beta features';
+$string['enablelcbetafeatures'] = 'Enable beta features';
+$string['enablelcbetafeatures_desc'] = 'Enable beta features';

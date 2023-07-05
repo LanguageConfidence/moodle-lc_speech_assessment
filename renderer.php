@@ -340,23 +340,24 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $all_feedback .= $speakingscore;
 
                 // Metadata - Content Relevance
-                $metadata = $this->render_metadata($result, $question);
-                $all_feedback .= '</div><div id="accordion">
-                                      <div>
-                                        <div id="headingOne">
-                                          <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
-                                                Content relevance
-                                            </button>
-                                          </h5>
+                if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+                    $metadata = $this->render_metadata($result, $question);
+                    $all_feedback .= '</div><div id="accordion">
+                                        <div>
+                                            <div id="headingOne">
+                                            <h5 class="mb-0">
+                                                <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
+                                                    Content relevance
+                                                </button>
+                                            </h5>
+                                            </div>
+                                        
+                                            <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                                <div class="qtype_lcspeech_words">' . $metadata . '</div>
+                                            </div>
                                         </div>
-                                    
-                                        <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                            <div class="qtype_lcspeech_words">' . $metadata . '</div>
-                                        </div>
-                                      </div>
-                                    </div>';
-                //
+                                        </div>';
+                }
 
                 $all_feedback .= '<div>';
                 $all_feedback .= '<div id="accordion">
@@ -432,23 +433,25 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $all_feedback .= $speakingscore;
 
                 // Metadata - Content Relevance
-                $metadata = $this->render_metadata($result, $question);
-                $all_feedback .= '</div><div id="accordion">
-                                        <div>
-                                        <div id="headingOne">
-                                            <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
-                                                Content relevance
-                                            </button>
-                                            </h5>
-                                        </div>
-                                    
-                                        <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                            <div class="qtype_lcspeech_words">' . $metadata . '</div>
-                                        </div>
-                                        </div>
-                                    </div>';
-                $all_feedback .= '<div>';
+                if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+                    $metadata = $this->render_metadata($result, $question);
+                    $all_feedback .= '</div><div id="accordion">
+                                            <div>
+                                            <div id="headingOne">
+                                                <h5 class="mb-0">
+                                                <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
+                                                    Content relevance
+                                                </button>
+                                                </h5>
+                                            </div>
+                                        
+                                            <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                                <div class="qtype_lcspeech_words">' . $metadata . '</div>
+                                            </div>
+                                            </div>
+                                        </div>';
+                    $all_feedback .= '<div>';
+                }
 
                 $pronunciation_feedback .= '<div id="accordion">
                     <div>
@@ -557,17 +560,8 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $dom->saveHTML();
     }
 
-
     protected function feedback_fluency($response, $question)
     {
-        $taggedFeedback = $response['fluency']['feedback']['tagged_transcript'];
-        // $taggedFeedback = "Well, this is a very good test. The test is about English <discourse-marker description=\"adding information\">and</discourse-marker> specifically about IELTS test. <speech-pause duration_seconds=\"2.0\"></speech-pause><discourse-marker description=\"contrasting\">However</discourse-marker>, it is, <filler-word>uh</filler-word>, more <word-repetition>like like</word-repetition> a mock test. Which is not referring to your actual results, but it can only refer to your practice results <discourse-marker description=\"indicating purpose\">in order to</discourse-marker> <word-repetition>prepare for you prepare for you</word-repetition>, <filler-word>uh</filler-word>, before the test";
-        $iConnective = substr_count($taggedFeedback, '</discourse-marker>');
-        $iFillerWord = substr_count($taggedFeedback, '</filler-word>');
-        $iWordRepetition = substr_count($taggedFeedback, '</word-repetition>');
-        $iSpeechPause = substr_count($taggedFeedback, '</speech-pause>');
-
-        $taggedFeedback = $this->build_fluency_feedback_transcript($taggedFeedback);
         $content = '
             <div class="feedback-card box-border">
                 <div>
@@ -590,30 +584,42 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 </div>
                 <div>' . $response['fluency']['feedback']['filler_words']['feedback_text'] . '</div>
             </div>
-            <div class="feedback-card box-border">
-                <div >
-                    <span class="bold-text">Tagged transcript</span>
-                    <div style="margin-top: 0px;">
-                        <div style="display: contents;margin-right: 5px;">
-                            <div class="c-feedback discourse-marker">' . $iConnective . '</div> Connectives&nbsp;&nbsp;&nbsp;&nbsp;
-                        </div>
-                        <div style="display: contents;margin-right: 5px;">
-                            <div class="c-feedback word-repetition">' . $iFillerWord . '</div> Word repetitions&nbsp;&nbsp;&nbsp;&nbsp;
-                        </div>
-                        <div style="display: contents;margin-right: 5px;">
-                            <div class="c-feedback filler-word">' . $iWordRepetition . '</div> Filler word&nbsp;&nbsp;&nbsp;&nbsp;
-                        </div>
-                        <div style="display: contents;">
-                            <div class="c-feedback speech-pause">' . $iSpeechPause . '</div> Pauses
-                        </div>
-                    </div>
-                </div>
-                <div>' . $taggedFeedback . '</div>
-            </div>
         ';
 
-        $feedback = '';
+        $taggedFeedback = $response['fluency']['feedback']['tagged_transcript'];
+        // $taggedFeedback = "Well, this is a very good test. The test is about English <discourse-marker description=\"adding information\">and</discourse-marker> specifically about IELTS test. <speech-pause duration_seconds=\"2.0\"></speech-pause><discourse-marker description=\"contrasting\">However</discourse-marker>, it is, <filler-word>uh</filler-word>, more <word-repetition>like like</word-repetition> a mock test. Which is not referring to your actual results, but it can only refer to your practice results <discourse-marker description=\"indicating purpose\">in order to</discourse-marker> <word-repetition>prepare for you prepare for you</word-repetition>, <filler-word>uh</filler-word>, before the test";
+        $iConnective = substr_count($taggedFeedback, '</discourse-marker>');
+        $iFillerWord = substr_count($taggedFeedback, '</filler-word>');
+        $iWordRepetition = substr_count($taggedFeedback, '</word-repetition>');
+        $iSpeechPause = substr_count($taggedFeedback, '</speech-pause>');
 
+        if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+            $taggedFeedback = $this->build_fluency_feedback_transcript($taggedFeedback);
+            $content .= '
+                <div class="feedback-card box-border">
+                    <div >
+                        <span class="bold-text">Tagged transcript</span>
+                        <div style="margin-top: 0px;">
+                            <div style="display: contents;margin-right: 5px;">
+                                <div class="c-feedback discourse-marker">' . $iConnective . '</div> Connectives&nbsp;&nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div style="display: contents;margin-right: 5px;">
+                                <div class="c-feedback word-repetition">' . $iFillerWord . '</div> Word repetitions&nbsp;&nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div style="display: contents;margin-right: 5px;">
+                                <div class="c-feedback filler-word">' . $iWordRepetition . '</div> Filler word&nbsp;&nbsp;&nbsp;&nbsp;
+                            </div>
+                            <div style="display: contents;">
+                                <div class="c-feedback speech-pause">' . $iSpeechPause . '</div> Pauses
+                            </div>
+                        </div>
+                    </div>
+                    <div>' . $taggedFeedback . '</div>
+                </div>
+            ';
+        }
+
+        $feedback = '';
         $feedback .= '<div id="accordionFeedback">
                         <div>
                             <div  id="headingOne">
