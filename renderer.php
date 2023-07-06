@@ -294,8 +294,8 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $all_feedback .= $this->render_tabs($question);
                 $all_feedback .= '<div class="tab-content" id="myTabContent">';
 
-                $pronunciation_feedback .= '
-                    <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade' . ($enableMetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
+                $pronunciation_feedback = '
+                    <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade show active" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
                         <div class="card-body box-border" style="margin: 15px 0 15px 0;">
                         <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
                         </div>
@@ -353,7 +353,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
                     ';
                 }
 
-                $pronunciation_feedback .= '
+                $pronunciation_feedback = '
                     <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade' . ($enableMetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
                         <div class="card-body box-border" style="margin: 15px 0 15px 0;">
                         <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
@@ -432,7 +432,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
                     ';
                 }
 
-                $pronunciation_feedback .= '
+                $pronunciation_feedback = '
                     <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade' . ($enableMetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
                         <div class="card-body box-border" style="margin: 15px 0 15px 0;">
                         <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
