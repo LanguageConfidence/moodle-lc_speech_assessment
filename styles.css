@@ -283,6 +283,10 @@ p.note {
     padding: 12px;
 }
 
+.que.lcspeech .nav-tabs {
+    gap: 0.25rem;
+}
+
 .que.lcspeech .nav-link:focus {
     position: relative;
 }
