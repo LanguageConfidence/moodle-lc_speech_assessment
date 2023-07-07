@@ -289,22 +289,21 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $feedbackPronuncation = $this->build_pronunciation_feedback($result['words']);
 
                 $all_feedback .= '<div><div class="qtype_lcspeech_average_score">Overall score: ' . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
-                $pronunciation_feedback .= '<div id="accordion">
-                    <div >
-                        <div  id="headingOne">
-                            <h5 class="mb-0">
-                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapsePro2Feedback-' . $question->id . '" aria-expanded="false" aria-controls="collapsePro2Feedback-' . $question->id . '">
-                                Pronunciation
-                            </button>
-                            </h5>
+
+                $all_feedback .= '</div>';
+                $all_feedback .= $this->render_tabs($question);
+                $all_feedback .= '<div class="tab-content" id="myTabContent">';
+
+                $pronunciation_feedback = '
+                    <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade show active" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
+                        <div class="card-body box-border" style="margin: 15px 0 15px 0;">
+                        <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
                         </div>
-                    
-                        <div id="collapsePro2Feedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                            <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
-                        </div>
-                    </div></div>';
+                    </div>
+                ';
 
                 $all_feedback .= $pronunciation_feedback;
+                $all_feedback .= '</div>';
             }
 
             return $question->format_text($all_feedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
@@ -331,52 +330,37 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $audio = $file->get_content();
                 $result = $question->get_score_for_audio($audio);
 
-                $feedback = $this->build_pronunciation_feedback($result['pronunciation']['words']);
+                $feedbackPronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
 
                 // Speaking score
                 $all_feedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
                 $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score_scripted($result, $question);
                 $all_feedback .= $speakingscore;
+                $all_feedback .= '</div>';
+
+                $all_feedback .= $this->render_tabs($question);
+                $all_feedback .= '<div class="tab-content" id="myTabContent">';
 
                 // Metadata - Content Relevance
-                if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+                $enableMetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
+                if ($enableMetadata) {
                     $metadata = $this->render_metadata($result, $question);
-                    $all_feedback .= '</div><div id="accordion">
-                                        <div>
-                                            <div id="headingOne">
-                                            <h5 class="mb-0">
-                                                <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
-                                                    Content relevance
-                                                </button>
-                                            </h5>
-                                            </div>
-                                        
-                                            <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                                <div class="qtype_lcspeech_words">' . $metadata . '</div>
-                                            </div>
-                                        </div>
-                                        </div>';
+                    $all_feedback .= '
+                        <div id="collapseMetaFeedback-' . $question->id . '" class="tab-pane fade show active" aria-labelledby="tabMetaFeedback-' . $question->id . '" role="tabpanel">
+                            <div class="qtype_lcspeech_words">' . $metadata . '</div>
+                        </div>
+                    ';
                 }
 
-                $all_feedback .= '<div>';
-                $all_feedback .= '<div id="accordion">
-                                      <div>
-                                        <div id="headingOne">
-                                          <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseProFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
-                                              Pronunciation
-                                            </button>
-                                          </h5>
-                                        </div>
-                                    
-                                        <div id="collapseProFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                          <div class="card-body box-border" style="margin: 15px 0 15px 0;">
-                                            <div class="qtype_lcspeech_words">' . $feedback . '</div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div></div>';
+                $pronunciation_feedback = '
+                    <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade' . ($enableMetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
+                        <div class="card-body box-border" style="margin: 15px 0 15px 0;">
+                        <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
+                        </div>
+                    </div>
+                ';
+                $all_feedback .= $pronunciation_feedback;
 
                 // Fluency feedback
                 $fluencyFeedback = $this->feedback_fluency($result, $question);
@@ -431,44 +415,30 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score_unscripted($result, $question);
                 $all_feedback .= $speakingscore;
+                $all_feedback .= '</div>';
+
+                $showGrammar = isset($result['grammar']['metrics']['mistake_count']) || isset($result['grammar']['metrics']['grammatical_complexity']);
+                $all_feedback .= $this->render_tabs($question, $showGrammar);
+                $all_feedback .= '<div class="tab-content" id="myTabContent">';
 
                 // Metadata - Content Relevance
-                if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
+                $enableMetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
+                if ($enableMetadata) {
                     $metadata = $this->render_metadata($result, $question);
-                    $all_feedback .= '</div><div id="accordion">
-                                            <div>
-                                            <div id="headingOne">
-                                                <h5 class="mb-0">
-                                                <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseMetaFeedback-' . $question->id . '" aria-expanded="false" aria-controls="collapseProFeedback-' . $question->id . '">
-                                                    Content relevance
-                                                </button>
-                                                </h5>
-                                            </div>
-                                        
-                                            <div id="collapseMetaFeedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                                                <div class="qtype_lcspeech_words">' . $metadata . '</div>
-                                            </div>
-                                            </div>
-                                        </div>';
-                    $all_feedback .= '<div>';
+                    $all_feedback .= '
+                        <div id="collapseMetaFeedback-' . $question->id . '" class="tab-pane fade show active" aria-labelledby="tabMetaFeedback-' . $question->id . '" role="tabpanel">
+                            <div class="qtype_lcspeech_words">' . $metadata . '</div>
+                        </div>
+                    ';
                 }
 
-                $pronunciation_feedback .= '<div id="accordion">
-                    <div>
-                        <div id="headingOne">
-                            <h5 class="mb-0">
-                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapsePro2Feedback-' . $question->id . '" aria-expanded="false" aria-controls="collapsePro2Feedback-' . $question->id . '">
-                                Pronunciation
-                            </button>
-                            </h5>
+                $pronunciation_feedback = '
+                    <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade' . ($enableMetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
+                        <div class="card-body box-border" style="margin: 15px 0 15px 0;">
+                        <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
                         </div>
-                    
-                        <div id="collapsePro2Feedback-' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
-                            <div class="card-body box-border" style="margin: 15px 0 15px 0;">
-                            <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
-                            </div>
-                        </div>
-                    </div></div>';
+                    </div>
+                ';
 
                 $all_feedback .= $pronunciation_feedback;
 
@@ -477,7 +447,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 $all_feedback .= $fluencyFeedback;
 
                 // Grammar
-                if (isset($result['grammar']['metrics']['mistake_count']) || isset($result['grammar']['metrics']['grammatical_complexity'])) {
+                if ($showGrammar) {
                     $grammar = $this->render_grammar($result, $question);
                     $all_feedback .= $grammar;
                 }
@@ -620,22 +590,69 @@ class qtype_lcspeech_renderer extends qtype_renderer
         }
 
         $feedback = '';
-        $feedback .= '<div id="accordionFeedback">
-                        <div>
-                            <div  id="headingOne">
-                                <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseFluency' . $question->id . '" aria-expanded="false" aria-controls="collapseFluency' . $question->id . '">
-                                        Fluency feedback
-                                    </button>
-                                </h5>
-                            </div>
-                                            
-                            <div id="collapseFluency' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#accordionFeedback">
-                                    <div class="qtype_lcspeech_words">' . $content . '</div>
-                            </div>
-                        </div>
-                    </div>';
+        $feedback .= '          
+            <div id="collapseFluency' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabFluency-' . $question->id . '">
+                <div class="qtype_lcspeech_words">' . $content . '</div>
+            </div>
+        ';
         return $feedback;
+    }
+
+    protected function render_tabs($question, $showGrammar = true)
+    {
+        $tabs = '
+            <ul class="nav nav-tabs mt-4" role="tablist">
+        ';
+
+        $enableMetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
+        if ($enableMetadata)
+            $tabs .= '
+                <li class="nav-item" role="presentation" id="tabMetaFeedback-' . $question->id . '">
+                    <button class="nav-link active" data-toggle="tab" data-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
+                        Content relevance
+                    </button>
+                </li>
+            ';
+
+        $tabs .= '
+            <li class="nav-item" role="presentation" id="tabPro2Feedback-' . $question->id . '">
+                <button class="nav-link' . ($enableMetadata ? '' : ' active') . '" data-toggle="tab" data-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($enableMetadata ? '"false"' : '"true"') . '>
+                    Pronunciation
+                </button>
+            </li>
+        ';
+        
+        if ($question->speechtype != 'pronunciation') {
+            $tabs .= '
+                <li class="nav-item" role="presentation" id="tabFluency-' . $question->id . '">
+                    <button class="nav-link" data-toggle="tab" data-target="#collapseFluency' . $question->id . '" type="button" role="tab" aria-controls="collapseFluency' . $question->id . '" aria-selected="false">
+                        Fluency feedback
+                    </button>
+                </li>
+            ';
+        }
+
+        if ($question->speechtype == 'unscripted') {
+            if ($showGrammar) {
+                $tabs .= '
+                    <li class="nav-item" role="presentation" id="tabGrammar-' . $question->id . '">
+                        <button class="nav-link" data-toggle="tab" data-target="#collapseGrammar' . $question->id . '" type="button" role="tab" aria-controls="collapseGrammar' . $question->id . '" aria-selected="false">
+                            Grammar feedback
+                        </button>
+                    </li>
+                ';
+            }
+            $tabs .= '
+                <li class="nav-item" role="presentation" id="tabVocabulary-' . $question->id . '">
+                    <button class="nav-link" data-toggle="tab" data-target="#collapseVocabulary' . $question->id . '" type="button" role="tab" aria-controls="collapseVocabulary' . $question->id . '" aria-selected="false">
+                        Vocabulary feedback
+                    </button>
+                </li>
+            ';
+        }
+        $tabs .= '</ul>';
+
+        return $tabs;
     }
 
     protected function render_metadata($response, $question)
@@ -724,21 +741,11 @@ class qtype_lcspeech_renderer extends qtype_renderer
         $grammar = '';
 
         if (!empty($content)) {
-            $grammar .= '<div id="accordionGrammar">
-                <div >
-                    <div  id="headingOne">
-                        <h5 class="mb-0">
-                            <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseGrammar' . $question->id . '" aria-expanded="false" aria-controls="collapseGrammar' . $question->id . '">
-                                Grammar feedback
-                            </button>
-                        </h5>
-                    </div>
-                                    
-                    <div id="collapseGrammar' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#collapseGrammar' . $question->id . '">
-                        <div class="qtype_lcspeech_words">' . $content . '</div>
-                    </div>
+            $grammar .= '              
+                <div id="collapseGrammar' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabGrammar-' . $question->id . '">
+                    <div class="qtype_lcspeech_words">' . $content . '</div>
                 </div>
-            </div>';
+            ';
         }
         return $grammar;
     }
@@ -758,21 +765,11 @@ class qtype_lcspeech_renderer extends qtype_renderer
             ';
 
         $grammar = '';
-        $grammar .= '<div id="accordionVocabulary">
-                        <div >
-                            <div  id="headingOne">
-                                <h5 class="mb-0">
-                                    <button type="button" class="btn btn-link cbtn section-header" data-toggle="collapse" data-target="#collapseVocabulary' . $question->id . '" aria-expanded="false" aria-controls="collapseVocabulary' . $question->id . '">
-                                    Vocabulary feedback
-                                    </button>
-                                </h5>
-                            </div>
-                                            
-                            <div id="collapseVocabulary' . $question->id . '" class="collapse" aria-labelledby="headingOne" data-parent="#collapseVocabulary' . $question->id . '">
-                                <div class="qtype_lcspeech_words">' . $content . '</div>
-                            </div>
-                        </div>
-                    </div>';
+        $grammar .= '           
+            <div id="collapseVocabulary' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabVocabulary-' . $question->id . '">
+                <div class="qtype_lcspeech_words">' . $content . '</div>
+            </div>
+        ';
         return $grammar;
     }
 
