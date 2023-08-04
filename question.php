@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Question class for the Speech Assessment question type.
@@ -18,8 +32,7 @@ require_once($CFG->dirroot . '/question/type/lcspeech/lib.php');
  *
  * @copyright 2023 Speech Assessment
  */
-class qtype_lcspeech_question extends question_graded_automatically
-{
+class qtype_lcspeech_question extends question_graded_automatically {
 
     /**
      * @var int the phrase that the student is to say out loud and to be assessed against.
@@ -46,8 +59,7 @@ class qtype_lcspeech_question extends question_graded_automatically
      */
     public $widgetplaceholders;
 
-    public function get_expected_data()
-    {
+    public function get_expected_data() {
         return ['recording' => question_attempt::PARAM_FILES];
     }
 
@@ -57,8 +69,7 @@ class qtype_lcspeech_question extends question_graded_automatically
      * @param context $context the context we are in.
      * @return int max size in bytes.
      */
-    public function get_upload_size_limit(context $context)
-    {
+    public function get_upload_size_limit(context $context) {
         global $CFG;
 
         $coursebytes = $maxbytes = 0;
@@ -70,8 +81,7 @@ class qtype_lcspeech_question extends question_graded_automatically
         return get_user_max_upload_file_size($context, $CFG->maxbytes, $coursebytes);
     }
 
-    public function summarise_response(array $response)
-    {
+    public function summarise_response(array $response) {
         if (!isset($response['recording']) || $response['recording'] === '') {
             return get_string('norecording', 'qtype_lcspeech');
         }
@@ -86,8 +96,7 @@ class qtype_lcspeech_question extends question_graded_automatically
         return get_string('filex', 'qtype_lcspeech', $file->get_filename());
     }
 
-    public function is_complete_response(array $response)
-    {
+    public function is_complete_response(array $response) {
         if (!isset($response['recording']) || $response['recording'] === '') {
             return false;
         }
@@ -102,8 +111,7 @@ class qtype_lcspeech_question extends question_graded_automatically
         return true;
     }
 
-    public function is_gradable_response(array $response)
-    {
+    public function is_gradable_response(array $response) {
         if (!isset($response['recording']) || $response['recording'] === '') {
             return false;
         }
@@ -119,8 +127,7 @@ class qtype_lcspeech_question extends question_graded_automatically
      * @param stored_file[] $files all the files from a response (e.g. $response['recording']->get_files();)
      * @return stored_file|null the file, if it exists, or null if not.
      */
-    public function get_file_from_response(string $filename, array $files): ?stored_file
-    {
+    public function get_file_from_response(string $filename, array $files): ?stored_file {
         foreach ($files as $file) {
             if ($file->get_filename() === $filename) {
                 return $file;
@@ -130,22 +137,15 @@ class qtype_lcspeech_question extends question_graded_automatically
         return null;
     }
 
-    public function get_validation_error(array $response)
-    {
+    public function get_validation_error(array $response) {
         if ($this->is_complete_response($response)) {
             return '';
         }
         return get_string('pleaserecordsomethingineachpart', 'qtype_lcspeech');
     }
 
-    public function get_score_for_audio($audio)
-    {
+    public function get_score_for_audio($audio) {
         global $DB;
-
-        // if (empty($this->speechphrase)) {
-        //    throw new \Exception('Question is missing speechphrase. This is a required field.');
-        // }
-
         $format = 'wav';
         $payload;
         // check speedtype
@@ -178,53 +178,52 @@ class qtype_lcspeech_question extends question_graded_automatically
             }
         }
 
-        $payload_keys = array_keys($payload);
-        sort($payload_keys);
-        $payload_hash = hash('sha256', json_encode(
+        $payloadkeys = array_keys($payload);
+        sort($payloadkeys);
+        $payloadhash = hash('sha256', json_encode(
             array_map(function ($key) use ($payload) {
                 return array($key => $payload[$key]);
-            }, $payload_keys)
+            }, $payloadkeys)
         ));
 
-        $db_record = $DB->get_record_sql(
+        $dbrecord = $DB->get_record_sql(
             "
                 SELECT response_json
                 FROM {qtype_lcspeech_api_results}
-                WHERE payload_hash = :payload_hash
+                WHERE payloadhash = :payloadhash
                 ORDER BY createdat DESC
                 LIMIT 1
             ",
             array(
-                'payload_hash' => $payload_hash
+                'payloadhash' => $payloadhash
             )
         );
 
-        if ($db_record) {
-            return json_decode($db_record->response_json, true);
+        if ($dbrecord) {
+            return json_decode($dbrecord->response_json, true);
         }
 
-        $processed_result = $this->call_api_and_process_response($payload);
+        $processedresult = $this->call_api_and_process_response($payload);
 
-        if (!$processed_result['success']) {
-            throw new \Exception($processed_result['error_message']);
+        if (!$processedresult['success']) {
+            throw new \Exception($processedresult['errormessage']);
         }
 
         $newrecord = new stdClass();
         $newrecord->sentence = '';
         $newrecord->format = $format;
         $newrecord->scoring = 'none';
-        $newrecord->payload_hash = $payload_hash;
-        $newrecord->response_json = $processed_result['raw_response'];
+        $newrecord->payloadhash = $payloadhash;
+        $newrecord->response_json = $processedresult['raw_response'];
         $newrecord->createdat = time();
         $DB->insert_record('qtype_lcspeech_api_results', $newrecord);
 
-        return $processed_result['parsed_response'];
+        return $processedresult['parsed_response'];
     }
 
-    protected function call_api_and_process_response($payload)
-    {
+    protected function call_api_and_process_response($payload) {
         global $CFG, $USER;
-        $api_key = $CFG->lcspeech_apikey;
+        $apikey = $CFG->lcspeech_apikey;
 
         $speechtype = $this->speechtype;
         $url;
@@ -240,7 +239,7 @@ class qtype_lcspeech_question extends question_graded_automatically
         // var_dump($endpoint);
         $header = array(
             'Content-Type: application/json',
-            'x-blobr-key: ' . $api_key,
+            'x-blobr-key: ' . $apikey,
             'x-user-id:' . $USER->id
         );
         // check setting lc-beta-features
@@ -255,10 +254,10 @@ class qtype_lcspeech_question extends question_graded_automatically
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        $result_raw = curl_exec($ch);
+        $resultraw = curl_exec($ch);
         curl_close($ch);
-        // var_dump($result_raw);
-        $result = json_decode($result_raw, true);
+        // var_dump($resultraw);
+        $result = json_decode($resultraw, true);
         // var_dump($endpoint);
         // var_dump('</br>');
         // var_dump($payload);
@@ -268,36 +267,35 @@ class qtype_lcspeech_question extends question_graded_automatically
         if ($result == null) {
             return array(
                 'success' => false,
-                'raw_response' => $result_raw,
+                'raw_response' => $resultraw,
                 'parsed_response' => $result,
-                'error_message' => 'Failed to get the score - Can not get response from API'
+                'errormessage' => 'Failed to get the score - Can not get response from API'
             );
         }
 
         if (array_key_exists('overall', $result) || array_key_exists('overall_score', $result)) {
             return array(
                 'success' => true,
-                'raw_response' => $result_raw,
+                'raw_response' => $resultraw,
                 'parsed_response' => $result,
-                'error_message' => null
+                'errormessage' => null
             );
         } else {
             if (array_key_exists('detail', $result)) {
-                $error_message = 'Error: ' . $result['detail'];
+                $errormessage = 'Error: ' . $result['detail'];
             } else {
-                $error_message = 'Failed to get the score';
+                $errormessage = 'Failed to get the score';
             }
             return array(
                 'success' => false,
-                'raw_response' => $result_raw,
+                'raw_response' => $resultraw,
                 'parsed_response' => $result,
-                'error_message' => $error_message
+                'errormessage' => $errormessage
             );
         }
     }
 
-    public function grade_response(array $response)
-    {
+    public function grade_response(array $response) {
         qtype_lcspeech_ensure_api_config_is_set();
         $scores = array();
         if ($this->is_complete_response($response)) {
@@ -323,18 +321,15 @@ class qtype_lcspeech_question extends question_graded_automatically
         );
     }
 
-    public function get_hint($hintnumber, question_attempt $qa)
-    {
+    public function get_hint($hintnumber, question_attempt $qa) {
         return null;
     }
 
-    public function get_right_answer_summary()
-    {
+    public function get_right_answer_summary() {
         return null;
     }
 
-    public function is_same_response(array $prevresponse, array $newresponse)
-    {
+    public function is_same_response(array $prevresponse, array $newresponse) {
         return question_utils::arrays_same_at_key_missing_is_blank(
             $prevresponse,
             $newresponse,
@@ -342,13 +337,11 @@ class qtype_lcspeech_question extends question_graded_automatically
         );
     }
 
-    public function get_answers()
-    {
+    public function get_answers() {
         return $this->answers;
     }
 
-    public function get_correct_response()
-    {
+    public function get_correct_response() {
         return null;
     }
 
