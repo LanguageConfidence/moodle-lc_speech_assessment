@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * The Speech Assessment question type question renderer class.
@@ -17,14 +31,12 @@ require_once($CFG->dirroot . '/question/type/lcspeech/lib.php');
  *
  * @copyright 2023 Speech Assessment
  */
-class qtype_lcspeech_renderer extends qtype_renderer
-{
+class qtype_lcspeech_renderer extends qtype_renderer {
 
     public $urls = [];
     public $range = '';
 
-    public function formulation_and_controls(question_attempt $qa, question_display_options $options)
-    {
+    public function formulation_and_controls(question_attempt $qa, question_display_options $options) {
         qtype_lcspeech_ensure_api_config_is_set();
 
         $question = $qa->get_question();
@@ -94,7 +106,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
             }
             $uploadrepository = reset($repositories); // Get the first (and only) upload repo.
             $setting = [
-                'speechPhrase' => (int) $question->speechphrase,
+                'speechphrase' => (int) $question->speechphrase,
                 'timeLimit' => (int) $question->timelimitinseconds,
                 'audioBitRate' => (int) get_config('qtype_lcspeech', 'audiobitrate'),
                 'maxUploadSize' => $question->get_upload_size_limit($options->context),
@@ -118,8 +130,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
      *
      * @return string HTML for the 'this can't work here' messages.
      */
-    protected function cannot_work_warnings()
-    {
+    protected function cannot_work_warnings() {
         return '
                 <div class="hide alert alert-danger https-warning">
                     <h5>' . get_string('insecurewarningtitle', 'qtype_lcspeech') . '</h5>
@@ -185,8 +196,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
      * @param string $filename the name of the audio file.
      * @return string HTML to output.
      */
-    protected function playback_ui($recordingurl, string $mediatype, string $filename)
-    {
+    protected function playback_ui($recordingurl, string $mediatype, string $filename) {
         // Prepare download link of icon and the title based on mimetype.
         $downloadlink = html_writer::link($recordingurl, $this->pix_icon(
             'f/' . $mediatype,
@@ -211,8 +221,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
      *
      * @return string HTML to output.
      */
-    protected function no_recording_message()
-    {
+    protected function no_recording_message() {
         return '
             <span class="playback-widget">
                 <span class="no-recording-placeholder">' .
@@ -222,8 +231,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
     }
 
 
-    protected function build_pronunciation_feedback($resultWords)
-    {
+    protected function build_pronunciation_feedback($resultwords) {
         $feedback = '';
 
         $words = array_filter(array_map(function ($word) {
@@ -234,39 +242,41 @@ class qtype_lcspeech_renderer extends qtype_renderer
                     return $phoneme['ipa_label'] !== 'SIL';
                 }),
             );
-        }, $resultWords), function ($word) {
+        }, $resultwords), function ($word) {
             return count($word['phones']) > 0;
         });
         foreach ($words as $word) {
-            $word_feedback = '';
+            $wordfeedback = '';
             foreach ($word['phones'] as $phoneme) {
                 if ($phoneme['phoneme_score'] >= 60) {
-                    $score_colour = 'green';
+                    $scorecolour = 'green';
                 } else if ($phoneme['phoneme_score'] >= 30) {
-                    $score_colour = 'orange';
+                    $scorecolour = 'orange';
                 } else {
-                    $score_colour = 'red';
+                    $scorecolour = 'red';
                 }
-                $phone_label = $phoneme['ipa_label'];
-                $score_colour_class = 'qtype_lcspeech_phoneme_label_' . $score_colour;
-                $word_feedback .= '<div class="qtype_lcspeech_phoneme"><div class="qtype_lcspeech_phoneme_label ' . $score_colour_class . '">' . $phone_label . '</div><div class="qtype_lcspeech_phoneme_score">' . $phoneme['phoneme_score'] . '%</div></div>';
+                $phonelabel = $phoneme['ipa_label'];
+                $scorecolourclass = 'qtype_lcspeech_phoneme_label_' . $scorecolour;
+                $wordfeedback .= '<div class="qtype_lcspeech_phoneme"><div class="qtype_lcspeech_phoneme_label '
+                . $scorecolourclass .'">'
+                . $phonelabel . '</div><div class="qtype_lcspeech_phoneme_score">' . $phoneme['phoneme_score'] . '%</div></div>';
             }
             if ($word['mean'] >= 60) {
-                $speechPhrase .= $word['label'] . ' ';
+                $speechphrase .= $word['label'] . ' ';
             } else if ($word['mean'] >= 30) {
-                $speechPhrase .= '<u style="color:orange">' . $word['label'] . '</u>  ';
+                $speechphrase .= '<u style="color:orange">' . $word['label'] . '</u>  ';
             } else {
-                $speechPhrase .= '<u style="color:red">' . $word['label'] . '</u>  ';
+                $speechphrase .= '<u style="color:red">' . $word['label'] . '</u>  ';
             }
 
-            $feedback .= '<div class="qtype_lcspeech_word"><div class="qtype_lcspeech_word_label">' . $word['label'] . '</div><div class="qtype_lcspeech_phonemes">' . $word_feedback . '</div></div>';
+            $feedback .= '<div class="qtype_lcspeech_word"><div class="qtype_lcspeech_word_label">'
+            . $word['label'] . '</div><div class="qtype_lcspeech_phonemes">' . $wordfeedback . '</div></div>';
         }
 
         return $feedback;
     }
 
-    public function specific_feedback_pronunciation(question_attempt $qa)
-    {
+    public function specific_feedback_pronunciation(question_attempt $qa) {
         qtype_lcspeech_ensure_api_config_is_set();
 
         $question = $qa->get_question();
@@ -279,40 +289,40 @@ class qtype_lcspeech_renderer extends qtype_renderer
         $response = $qa->get_last_qt_data();
         if (!empty($response) && $question->is_complete_response($response)) {
             $files = $response['recording']->get_files();
-            $all_feedback = '';
+            $allfeedback = '';
             foreach ($files as $file) {
                 $audio = $file->get_content();
                 $result = $question->get_score_for_audio($audio);
 
                 $feedback = '';
 
-                $feedbackPronuncation = $this->build_pronunciation_feedback($result['words']);
+                $feedbackpronuncation = $this->build_pronunciation_feedback($result['words']);
 
-                $all_feedback .= '<div><div class="qtype_lcspeech_average_score">Overall score: ' . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechPhrase . '</div>';
+                $allfeedback .= '<div><div class="qtype_lcspeech_average_score">Overall score: '
+                                . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechphrase . '</div>';
 
-                $all_feedback .= '</div>';
-                $all_feedback .= $this->render_tabs($question);
-                $all_feedback .= '<div class="tab-content" id="myTabContent">';
+                $allfeedback .= '</div>';
+                $allfeedback .= $this->render_tabs($question);
+                $allfeedback .= '<div class="tab-content" id="myTabContent">';
 
-                $pronunciation_feedback = '
+                $pronunciationfeedback = '
                     <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade show active" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
                         <div class="card-body box-border" style="margin: 15px 0 15px 0;">
-                        <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
+                        <div class="qtype_lcspeech_words">' . $feedbackpronuncation . '</div>
                         </div>
                     </div>
                 ';
 
-                $all_feedback .= $pronunciation_feedback;
-                $all_feedback .= '</div>';
+                $allfeedback .= $pronunciationfeedback;
+                $allfeedback .= '</div>';
             }
 
-            return $question->format_text($all_feedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
+            return $question->format_text($allfeedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
         }
         return '';
     }
 
-    public function specific_feedback_scripted(question_attempt $qa)
-    {
+    public function specific_feedback_scripted(question_attempt $qa) {
         qtype_lcspeech_ensure_api_config_is_set();
 
         $question = $qa->get_question();
@@ -325,57 +335,62 @@ class qtype_lcspeech_renderer extends qtype_renderer
         $response = $qa->get_last_qt_data();
         if (!empty($response) && $question->is_complete_response($response)) {
             $files = $response['recording']->get_files();
-            $all_feedback = '';
+            $allfeedback = '';
             foreach ($files as $file) {
                 $audio = $file->get_content();
                 $result = $question->get_score_for_audio($audio);
 
-                $feedbackPronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
+                $feedbackpronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
 
                 // Speaking score
-                $all_feedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
-                $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
+                $allfeedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;">
+                                    <div class="section-header qtype_lcspeech_average_score">Speaking score';
+                $allfeedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">'
+                                    . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score_scripted($result, $question);
-                $all_feedback .= $speakingscore;
-                $all_feedback .= '</div>';
+                $allfeedback .= $speakingscore;
+                $allfeedback .= '</div>';
 
-                $all_feedback .= $this->render_tabs($question);
-                $all_feedback .= '<div class="tab-content" id="myTabContent">';
+                $allfeedback .= $this->render_tabs($question);
+                $allfeedback .= '<div class="tab-content" id="myTabContent">';
 
                 // Metadata - Content Relevance
-                $enableMetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
-                if ($enableMetadata) {
+                $enablemetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
+                if ($enablemetadata) {
                     $metadata = $this->render_metadata($result, $question);
-                    $all_feedback .= '
-                        <div id="collapseMetaFeedback-' . $question->id . '" class="tab-pane fade show active" aria-labelledby="tabMetaFeedback-' . $question->id . '" role="tabpanel">
+                    $allfeedback .= '
+                        <div id="collapseMetaFeedback-'
+                        . $question->id .
+                        '" class="tab-pane fade show active" aria-labelledby="tabMetaFeedback-' . $question->id . '" role="tabpanel">
                             <div class="qtype_lcspeech_words">' . $metadata . '</div>
                         </div>
                     ';
                 }
 
-                $pronunciation_feedback = '
-                    <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade' . ($enableMetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
+                $pronunciationfeedback = '
+                    <div id="collapsePro2Feedback-'
+                        . $question->id . '" class="tab-pane fade'
+                        . ($enablemetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
                         <div class="card-body box-border" style="margin: 15px 0 15px 0;">
-                        <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
+                        <div class="qtype_lcspeech_words">' . $feedbackpronuncation . '</div>
                         </div>
                     </div>
                 ';
-                $all_feedback .= $pronunciation_feedback;
+                $allfeedback .= $pronunciationfeedback;
 
                 // Fluency feedback
-                $fluencyFeedback = $this->feedback_fluency($result, $question);
-                $all_feedback .= $fluencyFeedback;
+                $fluencyfeedback = $this->feedback_fluency($result, $question);
+                $allfeedback .= $fluencyfeedback;
 
                 // end
-                $all_feedback .= '</div>';
+                $allfeedback .= '</div>';
             }
-            return $question->format_text($all_feedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
+            return $question->format_text($allfeedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
         }
         return '';
     }
 
-    public function specific_feedback(question_attempt $qa)
-    {
+    public function specific_feedback(question_attempt $qa) {
         $question = $qa->get_question();
         // var_dump($question->speechtype);
 
@@ -389,8 +404,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return null;
     }
 
-    public function specific_feedback_unscripted(question_attempt $qa)
-    {
+    public function specific_feedback_unscripted(question_attempt $qa) {
         qtype_lcspeech_ensure_api_config_is_set();
 
         $question = $qa->get_question();
@@ -403,135 +417,144 @@ class qtype_lcspeech_renderer extends qtype_renderer
         $response = $qa->get_last_qt_data();
         if (!empty($response) && $question->is_complete_response($response)) {
             $files = $response['recording']->get_files();
-            $all_feedback = '';
+            $allfeedback = '';
             foreach ($files as $file) {
                 $audio = $file->get_content();
                 $result = $question->get_score_for_audio($audio);
 
-                $feedbackPronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
+                $feedbackpronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
 
                 // Speaking score unscripted
-                $all_feedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
-                $all_feedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
+                $allfeedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;">
+                                    <div class="section-header qtype_lcspeech_average_score">Speaking score';
+                $allfeedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">'
+                                . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score_unscripted($result, $question);
-                $all_feedback .= $speakingscore;
-                $all_feedback .= '</div>';
+                $allfeedback .= $speakingscore;
+                $allfeedback .= '</div>';
 
-                $showGrammar = isset($result['grammar']['metrics']['mistake_count']) || isset($result['grammar']['metrics']['grammatical_complexity']);
-                $all_feedback .= $this->render_tabs($question, $showGrammar);
-                $all_feedback .= '<div class="tab-content" id="myTabContent">';
+                $showgrammar = isset($result['grammar']['metrics']['mistake_count']) || isset($result['grammar']['metrics']['grammatical_complexity']);
+                $allfeedback .= $this->render_tabs($question, $showgrammar);
+                $allfeedback .= '<div class="tab-content" id="myTabContent">';
 
                 // Metadata - Content Relevance
-                $enableMetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
-                if ($enableMetadata) {
+                $enablemetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
+                if ($enablemetadata) {
                     $metadata = $this->render_metadata($result, $question);
-                    $all_feedback .= '
-                        <div id="collapseMetaFeedback-' . $question->id . '" class="tab-pane fade show active" aria-labelledby="tabMetaFeedback-' . $question->id . '" role="tabpanel">
+                    $allfeedback .= '
+                        <div id="collapseMetaFeedback-'
+                        . $question->id .
+                        '" class="tab-pane fade show active" aria-labelledby="tabMetaFeedback-'
+                        . $question->id .
+                        '" role="tabpanel">
                             <div class="qtype_lcspeech_words">' . $metadata . '</div>
                         </div>
                     ';
                 }
 
-                $pronunciation_feedback = '
-                    <div id="collapsePro2Feedback-' . $question->id . '" class="tab-pane fade' . ($enableMetadata ? '' : ' show active') . '" aria-labelledby="tabPro2Feedback-' . $question->id . '" role="tabpanel">
+                $pronunciationfeedback = '
+                    <div id="collapsePro2Feedback-'
+                    . $question->id .
+                    '" class="tab-pane fade'
+                    . ($enablemetadata ? '' : ' show active')
+                    . '" aria-labelledby="tabPro2Feedback-'
+                    . $question->id .
+                    '" role="tabpanel">
                         <div class="card-body box-border" style="margin: 15px 0 15px 0;">
-                        <div class="qtype_lcspeech_words">' . $feedbackPronuncation . '</div>
+                        <div class="qtype_lcspeech_words">'
+                        . $feedbackpronuncation
+                        . '</div>
                         </div>
                     </div>
                 ';
 
-                $all_feedback .= $pronunciation_feedback;
+                $allfeedback .= $pronunciationfeedback;
 
                 // Fluency feedback
-                $fluencyFeedback = $this->feedback_fluency($result, $question);
-                $all_feedback .= $fluencyFeedback;
+                $fluencyfeedback = $this->feedback_fluency($result, $question);
+                $allfeedback .= $fluencyfeedback;
 
                 // Grammar
-                if ($showGrammar) {
+                if ($showgrammar) {
                     $grammar = $this->render_grammar($result, $question);
-                    $all_feedback .= $grammar;
+                    $allfeedback .= $grammar;
                 }
 
-                // vocabulary 
+                // vocabulary
                 $vocabulary = $this->render_vocabulary($result, $question);
-                $all_feedback .= $vocabulary;
+                $allfeedback .= $vocabulary;
 
-                $all_feedback .= '</div>';
+                $allfeedback .= '</div>';
             }
 
-            return $question->format_text($all_feedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
+            return $question->format_text($allfeedback, FORMAT_HTML, $qa, 'question', 'answerfeedback', null);
         }
         return '';
     }
 
-    protected function formatted_fluency_feedback_transcript($tagged)
-    {
+    protected function formatted_fluency_feedback_transcript($tagged) {
         // replace \" -> '
-        $fTaggged = "<discourse-marker description=\"test\"></discourse-marker>" . $tagged;
-        $fTaggged = str_replace("\"", "'", $fTaggged);
+        $ftaggged = "<discourse-marker description=\"test\"></discourse-marker>" . $tagged;
+        $ftaggged = str_replace("\"", "'", $ftaggged);
         // filler-word
-        // $fTaggged = str_replace("filler-word", "filler-word filler-word='filler word'", $tagged);
+        // $ftaggged = str_replace("filler-word", "filler-word filler-word='filler word'", $tagged);
         // word-repetition
-        // $fTaggged = str_replace("word-repetition", "word-repetition word-repetition='word repetition'", $tagged);
+        // $ftaggged = str_replace("word-repetition", "word-repetition word-repetition='word repetition'", $tagged);
         // <i class="icon fa fa-clock-o" aria-hidden="true"></i>
-        $fTaggged = str_replace("</speech-pause>", "[pause]</speech-pause> ", $fTaggged);
+        $ftaggged = str_replace("</speech-pause>", "[pause]</speech-pause> ", $ftaggged);
 
-        // echo  $fTaggged;
-        return $fTaggged;
+        // echo  $ftaggged;
+        return $ftaggged;
     }
 
-    protected function fluency_feedback_transcript_append_child($dom, $nodes, $title, $content)
-    {
+    protected function fluency_feedback_transcript_append_child($dom, $nodes, $title, $content) {
         foreach ($nodes as $d) {
             switch ($title) {
                 case 'Connective':
-                    $vMakers = $d->attributes->item(0)->value;
-                    $content = "Used for: " . $vMakers;
+                    $vmakers = $d->attributes->item(0)->value;
+                    $content = "Used for: " . $vmakers;
                     break;
                 case 'Speech pause':
-                    $vMakers = $d->attributes->item(0)->value;
-                    $content = "Duration seconds: " . $vMakers;
+                    $vmakers = $d->attributes->item(0)->value;
+                    $content = "Duration seconds: " . $vmakers;
                     break;
                 default:
                     break;
             }
 
-            $nodeSpan = $dom->createElement("span");
-            $nodeDiv1 = $dom->createElement("p", $title);
-            $nodeDiv1->setAttribute("class", "t-title");
-            $nodeDiv2 = $dom->createElement("p", $content);
-            $nodeDiv2->setAttribute("class", "t-content");
-            $nodeSpan->appendChild($nodeDiv1);
-            $nodeSpan->appendChild($nodeDiv2);
-            $d->appendChild($nodeSpan);
+            $nodespan = $dom->createElement("span");
+            $nodediv1 = $dom->createElement("p", $title);
+            $nodediv1->setAttribute("class", "t-title");
+            $nodediv2 = $dom->createElement("p", $content);
+            $nodediv2->setAttribute("class", "t-content");
+            $nodespan->appendChild($nodediv1);
+            $nodespan->appendChild($nodediv2);
+            $d->appendChild($nodespan);
             $d->setAttribute("class", "t-tooltips");
         }
     }
 
-    protected function build_fluency_feedback_transcript($html)
-    {
-        // $html = "Well, this is a very good test. The test is about English <discourse-marker description=\"adding information\">and</discourse-marker> specifically about IELTS test. <speech-pause duration_seconds=\"2.0\"></speech-pause><discourse-marker description=\"contrasting\">However</discourse-marker>, it is, <filler-word>uh</filler-word>, more <word-repetition>like like</word-repetition> a mock test. Which is not referring to your actual results, but it can only refer to your practice results <discourse-marker description=\"indicating purpose\">in order to</discourse-marker> <word-repetition>prepare for you prepare for you</word-repetition>, <filler-word>uh</filler-word>, before the test";
-        $taggedFeedback = $this->formatted_fluency_feedback_transcript($html);
+    protected function build_fluency_feedback_transcript($html) {
+        $taggedfeedback = $this->formatted_fluency_feedback_transcript($html);
         $dom = new DOMDocument();
         libxml_use_internal_errors(true);
-        $dom->loadHTML($taggedFeedback);
-        $discourseMarkers = $dom->getElementsByTagName("discourse-marker");
-        $this->fluency_feedback_transcript_append_child($dom, $discourseMarkers, "Connective", null);
+        $dom->loadHTML($taggedfeedback);
+        $discoursemarkers = $dom->getElementsByTagName("discourse-marker");
+        $this->fluency_feedback_transcript_append_child($dom, $discoursemarkers, "Connective", null);
 
-        $fillerWord = $dom->getElementsByTagName("filler-word");
-        $this->fluency_feedback_transcript_append_child($dom, $fillerWord, "Filler word", "Used for: filler word");
+        $fillerword = $dom->getElementsByTagName("filler-word");
+        $this->fluency_feedback_transcript_append_child($dom, $fillerword, "Filler word", "Used for: filler word");
 
-        $wordRepetition = $dom->getElementsByTagName("word-repetition");
-        $this->fluency_feedback_transcript_append_child($dom, $wordRepetition, "Word repetition", "Used for: Word repetition");
+        $wordrepetition = $dom->getElementsByTagName("word-repetition");
+        $this->fluency_feedback_transcript_append_child($dom, $wordrepetition, "Word repetition", "Used for: Word repetition");
 
-        $speechPause = $dom->getElementsByTagName("speech-pause");
-        $this->fluency_feedback_transcript_append_child($dom, $speechPause, "Speech pause", null);
+        $speechpause = $dom->getElementsByTagName("speech-pause");
+        $this->fluency_feedback_transcript_append_child($dom, $speechpause, "Speech pause", null);
 
         return $dom->saveHTML();
     }
 
-    protected function feedback_fluency($response, $question)
-    {
+    protected function feedback_fluency($response, $question) {
         $content = '
             <div class="feedback-card box-border">
                 <div>
@@ -556,41 +579,40 @@ class qtype_lcspeech_renderer extends qtype_renderer
             </div>
         ';
 
-        $taggedFeedback = $response['fluency']['feedback']['tagged_transcript'];
-        // $taggedFeedback = "Well, this is a very good test. The test is about English <discourse-marker description=\"adding information\">and</discourse-marker> specifically about IELTS test. <speech-pause duration_seconds=\"2.0\"></speech-pause><discourse-marker description=\"contrasting\">However</discourse-marker>, it is, <filler-word>uh</filler-word>, more <word-repetition>like like</word-repetition> a mock test. Which is not referring to your actual results, but it can only refer to your practice results <discourse-marker description=\"indicating purpose\">in order to</discourse-marker> <word-repetition>prepare for you prepare for you</word-repetition>, <filler-word>uh</filler-word>, before the test";
-        $iConnective = substr_count($taggedFeedback, '</discourse-marker>');
-        $iFillerWord = substr_count($taggedFeedback, '</filler-word>');
-        $iWordRepetition = substr_count($taggedFeedback, '</word-repetition>');
-        $iSpeechPause = substr_count($taggedFeedback, '</speech-pause>');
+        $taggedfeedback = $response['fluency']['feedback']['tagged_transcript'];
+        $iconnective = substr_count($taggedfeedback, '</discourse-marker>');
+        $ifillerword = substr_count($taggedfeedback, '</filler-word>');
+        $iwordrepetition = substr_count($taggedfeedback, '</word-repetition>');
+        $ispeechpause = substr_count($taggedfeedback, '</speech-pause>');
 
         if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
-            $taggedFeedback = $this->build_fluency_feedback_transcript($taggedFeedback);
+            $taggedfeedback = $this->build_fluency_feedback_transcript($taggedfeedback);
             $content .= '
                 <div class="feedback-card box-border">
                     <div >
                         <span class="bold-text">Tagged transcript</span>
                         <div style="margin-top: 0px;">
                             <div style="display: contents;margin-right: 5px;">
-                                <div class="c-feedback discourse-marker">' . $iConnective . '</div> Connectives&nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="c-feedback discourse-marker">' . $iconnective . '</div> Connectives&nbsp;&nbsp;&nbsp;&nbsp;
                             </div>
                             <div style="display: contents;margin-right: 5px;">
-                                <div class="c-feedback word-repetition">' . $iFillerWord . '</div> Word repetitions&nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="c-feedback word-repetition">' . $ifillerword . '</div> Word repetitions&nbsp;&nbsp;&nbsp;&nbsp;
                             </div>
                             <div style="display: contents;margin-right: 5px;">
-                                <div class="c-feedback filler-word">' . $iWordRepetition . '</div> Filler word&nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="c-feedback filler-word">' . $iwordrepetition . '</div> Filler word&nbsp;&nbsp;&nbsp;&nbsp;
                             </div>
                             <div style="display: contents;">
-                                <div class="c-feedback speech-pause">' . $iSpeechPause . '</div> Pauses
+                                <div class="c-feedback speech-pause">' . $ispeechpause . '</div> Pauses
                             </div>
                         </div>
                     </div>
-                    <div>' . $taggedFeedback . '</div>
+                    <div>' . $taggedfeedback . '</div>
                 </div>
             ';
         }
 
         $feedback = '';
-        $feedback .= '          
+        $feedback .= '
             <div id="collapseFluency' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabFluency-' . $question->id . '">
                 <div class="qtype_lcspeech_words">' . $content . '</div>
             </div>
@@ -598,34 +620,46 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $feedback;
     }
 
-    protected function render_tabs($question, $showGrammar = true)
-    {
+    protected function render_tabs($question, $showgrammar = true) {
         $tabs = '
             <ul class="nav nav-tabs mt-4" role="tablist">
         ';
 
-        $enableMetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
-        if ($enableMetadata)
+        $enablemetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
+        if ($enablemetadata) {
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabMetaFeedback-' . $question->id . '">
-                    <button class="nav-link active" data-toggle="tab" data-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
+                    <button class="nav-link active" data-toggle="tab" data-target="#collapseMetaFeedback-'
+                    . $question->id .
+                    '" type="button" role="tab" aria-controls="collapseProFeedback-'
+                    . $question->id .
+                    '" aria-selected="true">
                         Content relevance
                     </button>
                 </li>
             ';
+        }
 
         $tabs .= '
             <li class="nav-item" role="presentation" id="tabPro2Feedback-' . $question->id . '">
-                <button class="nav-link' . ($enableMetadata ? '' : ' active') . '" data-toggle="tab" data-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($enableMetadata ? '"false"' : '"true"') . '>
+                <button class="nav-link'
+                . ($enablemetadata ? '' : ' active') .
+                 '" data-toggle="tab" data-target="#collapsePro2Feedback-'
+                 . $question->id .
+                 '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($enablemetadata ? '"false"' : '"true"') . '>
                     Pronunciation
                 </button>
             </li>
         ';
-        
+
         if ($question->speechtype != 'pronunciation') {
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabFluency-' . $question->id . '">
-                    <button class="nav-link" data-toggle="tab" data-target="#collapseFluency' . $question->id . '" type="button" role="tab" aria-controls="collapseFluency' . $question->id . '" aria-selected="false">
+                    <button class="nav-link" data-toggle="tab" data-target="#collapseFluency'
+                    . $question->id .
+                    '" type="button" role="tab" aria-controls="collapseFluency'
+                    . $question->id .
+                    '" aria-selected="false">
                         Fluency feedback
                     </button>
                 </li>
@@ -633,10 +667,14 @@ class qtype_lcspeech_renderer extends qtype_renderer
         }
 
         if ($question->speechtype == 'unscripted') {
-            if ($showGrammar) {
+            if ($showgrammar) {
                 $tabs .= '
                     <li class="nav-item" role="presentation" id="tabGrammar-' . $question->id . '">
-                        <button class="nav-link" data-toggle="tab" data-target="#collapseGrammar' . $question->id . '" type="button" role="tab" aria-controls="collapseGrammar' . $question->id . '" aria-selected="false">
+                        <button class="nav-link" data-toggle="tab" data-target="#collapseGrammar'
+                        . $question->id .
+                        '" type="button" role="tab" aria-controls="collapseGrammar'
+                        . $question->id .
+                        '" aria-selected="false">
                             Grammar feedback
                         </button>
                     </li>
@@ -644,7 +682,11 @@ class qtype_lcspeech_renderer extends qtype_renderer
             }
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabVocabulary-' . $question->id . '">
-                    <button class="nav-link" data-toggle="tab" data-target="#collapseVocabulary' . $question->id . '" type="button" role="tab" aria-controls="collapseVocabulary' . $question->id . '" aria-selected="false">
+                    <button class="nav-link" data-toggle="tab" data-target="#collapseVocabulary'
+                    . $question->id .
+                    '" type="button" role="tab" aria-controls="collapseVocabulary'
+                    . $question->id .
+                    '" aria-selected="false">
                         Vocabulary feedback
                     </button>
                 </li>
@@ -655,8 +697,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $tabs;
     }
 
-    protected function render_metadata($response, $question)
-    {
+    protected function render_metadata($response, $question) {
         $content = "";
 
         if ($question->speechtype == 'scripted') {
@@ -685,25 +726,25 @@ class qtype_lcspeech_renderer extends qtype_renderer
             ';
 
             if (isset($response['metadata']['content_relevance']) && isset($response['metadata']['content_relevance_feedback'])) {
-                $labelStyle = 'comlexity_label_' . $response['metadata']['content_relevance'];
+                $labelstyle = 'comlexity_label_' . $response['metadata']['content_relevance'];
                 $content .= '
                     <div class="feedback-card box-border">
                         <div>
                             <span class="bold-text">Unscripted content relevance score</span>
-                            <span class="' . $labelStyle . '">' . ucwords(strtolower(str_replace("_", " ", $response['metadata']['content_relevance']))) . '</span>
+                            <span class="' . $labelstyle . '">' . ucwords(strtolower(str_replace("_", " ", $response['metadata']['content_relevance']))) . '</span>
                         </div>
                         <div>' . $response['metadata']['content_relevance_feedback'] . '</div>
                     </div>
                 ';
             }
 
-            if (isset($response['metadata']['valid_answer'])) {
-                $valid_answer = str_replace('_', ' ', $response['metadata']['valid_answer']);
+            if (isset($response['metadata']['validanswer'])) {
+                $validanswer = str_replace('_', ' ', $response['metadata']['validanswer']);
 
                 $content .= '
                     <div class="metadata-card box-border">
                         <div><span class="bold-text">Valid answer</span></div>
-                        <div>' . $valid_answer . '</div>
+                        <div>' . $validanswer . '</div>
                     </div>
                 ';
             }
@@ -712,9 +753,8 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $content;
     }
 
-    protected function render_grammar($result, $question)
-    {
-        $labelStyle = 'comlexity_label_' . $result['grammar']['metrics']['grammatical_complexity'];
+    protected function render_grammar($result, $question) {
+        $labelstyle = 'comlexity_label_' . $result['grammar']['metrics']['grammatical_complexity'];
         $content = '';
         if (isset($result['grammar']['metrics']['mistake_count'])) {
             $content .= '
@@ -732,7 +772,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 <div class="feedback-card box-border">
                     <div>
                         <span class="bold-text">Grammatical complexity</span>
-                        <span class="' . $labelStyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
+                        <span class="' . $labelstyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
                     </div>
                 </div>
                 ';
@@ -741,7 +781,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         $grammar = '';
 
         if (!empty($content)) {
-            $grammar .= '              
+            $grammar .= '
                 <div id="collapseGrammar' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabGrammar-' . $question->id . '">
                     <div class="qtype_lcspeech_words">' . $content . '</div>
                 </div>
@@ -750,22 +790,21 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $grammar;
     }
 
-    protected function render_vocabulary($result, $question)
-    {
-        $labelStyle = 'comlexity_label_' . $result['vocabulary']['metrics']['vocabulary_complexity'];
+    protected function render_vocabulary($result, $question) {
+        $labelstyle = 'comlexity_label_' . $result['vocabulary']['metrics']['vocabulary_complexity'];
 
         $content = '';
         $content .= '
             <div class="feedback-card box-border">
                 <div>
                     <span class="bold-text">Vocabulary complexity</span>
-                    <span class="' . $labelStyle . '">' . ucwords(strtolower($result['vocabulary']['metrics']['vocabulary_complexity'])) . '</span>
+                    <span class="' . $labelstyle . '">' . ucwords(strtolower($result['vocabulary']['metrics']['vocabulary_complexity'])) . '</span>
                 </div>
             </div>
             ';
 
         $grammar = '';
-        $grammar .= '           
+        $grammar .= '
             <div id="collapseVocabulary' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabVocabulary-' . $question->id . '">
                 <div class="qtype_lcspeech_words">' . $content . '</div>
             </div>
@@ -773,8 +812,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $grammar;
     }
 
-    protected function render_speaking_score_scripted($result, $question)
-    {
+    protected function render_speaking_score_scripted($result, $question) {
         $feedback = '';
         $feedback .= '<table style="table-layout: fixed ; width: 100%;" class="generaltable generalbox quizreviewsummary metadata-table">';
         $feedback .= '<tbody>';
@@ -796,21 +834,18 @@ class qtype_lcspeech_renderer extends qtype_renderer
                 <td scope="row">' . $result['overall']['english_proficiency_scores'][$this->get_config_scoring_option($question)]['prediction'] . '</td>
             </tr>';
         }
-
-
         $feedback .= '</tbody>';
         $feedback .= '</table>';
 
         return $feedback;
     }
 
-    protected function get_config_scoring_option($question)
-    {
-        $global_scoring_opt = get_config('qtype_lcspeech', 'scoringoptionsetting');
-        $scoring_option = !empty($question->scoringoption) ? $question->scoringoption : $global_scoring_opt;
+    protected function get_config_scoring_option($question) {
+        $globalscoringopt = get_config('qtype_lcspeech', 'scoringoptionsetting');
+        $scoringoption = !empty($question->scoringoption) ? $question->scoringoption : $globalscoringopt;
 
         $config = "";
-        switch ($scoring_option) {
+        switch ($scoringoption) {
             case "PTE":
                 $config = "mock_pte";
                 break;
@@ -828,13 +863,12 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $config;
     }
 
-    protected function get_config_scoring_option_display($question)
-    {
-        $global_scoring_opt = get_config('qtype_lcspeech', 'scoringoptionsetting');
-        $scoring_option = !empty($question->scoringoption) ? $question->scoringoption : $global_scoring_opt;
+    protected function get_config_scoring_option_display($question) {
+        $globalscoringopt = get_config('qtype_lcspeech', 'scoringoptionsetting');
+        $scoringoption = !empty($question->scoringoption) ? $question->scoringoption : $globalscoringopt;
 
         $config = "";
-        switch ($scoring_option) {
+        switch ($scoringoption) {
             case "PTE":
                 $config = "Mock PTE";
                 break;
@@ -852,8 +886,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $config;
     }
 
-    protected function render_speaking_score_unscripted($result, $question)
-    {
+    protected function render_speaking_score_unscripted($result, $question) {
         $feedback = '';
         $feedback .= '<table class="generaltable generalbox quizreviewsummary unscript-speaking-table">';
         $feedback .= '<tbody>';
@@ -902,8 +935,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
         return $feedback;
     }
 
-    public function feedback(question_attempt $qa, question_display_options $options)
-    {
+    public function feedback(question_attempt $qa, question_display_options $options) {
         $output = '';
         $hint = null;
 
@@ -932,25 +964,23 @@ class qtype_lcspeech_renderer extends qtype_renderer
 
         if (!empty($this->urls) || ($options->generalfeedback && !empty($this->general_feedback($qa)))) {
             $output .= '<div id="accordion">
-                                      <div class="card">
-                                        <div class="card-header" id="headingTwo">
-                                          <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                              Sample Answer
-                                            </button>
-                                            <span><p class="note">Note: You should try your best before clicking here</p></span>
-                                          </h5>
-                                        </div>
+                        <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Sample Answer
+                            </button>
+                            <span><p class="note">Note: You should try your best before clicking here</p></span>
+                            </h5>
+                        </div>
 
-                                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                                          <div class="card-body">';
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                            <div class="card-body">';
         }
 
         if (!empty($this->urls)) {
-            $output .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_average_score">Correct Audio</div><div>' . $this->getCorretionAudios($this->urls) . '</div>';
+            $output .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_average_score">Correct Audio</div><div>' . $this->get_corretion_audios($this->urls) . '</div>';
         }
-
-
         if ($options->generalfeedback) {
             $output .= html_writer::nonempty_tag(
                 'div',
@@ -972,14 +1002,18 @@ class qtype_lcspeech_renderer extends qtype_renderer
         }
 
         if (!empty($this->range)) {
-            $output .= '<div class="mt-5" id="accordion"><div class="card"><div class="card-header" id="headingThree"><h5 class="mb-0"><button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                              Feedback
-                                            </button>
-                                          </h5>
-                                        </div>
+            $output .= '<div class="mt-5" id="accordion">
+            <div class="card">
+                <div class="card-header" id="headingThree">
+                    <h5 class="mb-0">
+                        <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                          Feedback
+                        </button>
+                    </h5>
+                </div>
 
-                                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-                                          <div class="card-body"><div class="qtype_lcspeech_file"><p>' . $this->range . '</p></div></div></div></div></div>';
+                <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                    <div class="card-body"><div class="qtype_lcspeech_file"><p>' . $this->range . '</p></div></div></div></div></div>';
         }
         $output .= '</div>';
 
@@ -991,8 +1025,7 @@ class qtype_lcspeech_renderer extends qtype_renderer
      *
      * @return string[] lang string names from the qtype_lcspeech lang file.
      */
-    public function strings_for_js()
-    {
+    public function strings_for_js() {
         return [
             'gumabort',
             'gumabort_title',
@@ -1025,19 +1058,17 @@ class qtype_lcspeech_renderer extends qtype_renderer
         ];
     }
 
-    private function nBetween($varToCheck, $high, $low)
-    {
-        if ($varToCheck < $low) {
+    private function n_between($vartocheck, $high, $low) {
+        if ($vartocheck < $low) {
             return false;
         }
-        if ($varToCheck > $high) {
+        if ($vartocheck > $high) {
             return false;
         }
         return true;
     }
 
-    private function getCorretionAudios($urls)
-    {
+    private function get_corretion_audios($urls) {
         if (empty($urls)) {
             return '';
         }

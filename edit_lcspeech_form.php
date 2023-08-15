@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <https://www.gnu.org/licenses/>.
 
 /**
  * Defines the editing form for LC Speech Assessment questions.
@@ -19,20 +33,18 @@ require_once($CFG->dirroot . '/question/type/edit_question_form.php');
  *
  * @copyright 2021 LC Speech Assessment
  */
-class qtype_lcspeech_edit_form extends question_edit_form
-{
+class qtype_lcspeech_edit_form extends question_edit_form {
 
-    protected function definition_inner($mform)
-    {
+    protected function definition_inner($mform) {
         // var_dump(html_writer::div('Mr', 'toad', array('id' => 'tophat')));
 
         // Field for speech_assessment_type
-        $attributes =  array('onchange' => $this->onChangeQuestionTypeJS());
+        $attributes = array('onchange' => $this->on_change_question_type_js());
         $mform->addElement(
             'select',
             'speechtype',
             get_string('speechtype', 'qtype_lcspeech'),
-            $this->buildSpeechTypeOptionSelect(),
+            $this->build_speech_type_option_select(),
             $attributes
         );
         $mform->setDefault('speechtype', qtype_lcspeech::DEFAULT_SPEECH_ASSESSMENT);
@@ -117,15 +129,14 @@ class qtype_lcspeech_edit_form extends question_edit_form
             $mform->hideIf('contextvalidanswerdescription', 'hascontext', '0');
         }
 
-        $this::hideFeedbackAndAudio($mform);
+        $this::hide_feedback_and_audio($mform);
         // process case Edit
         // $mform->disabledIf('speechphrase', 'speechtype', 'eq', 'unscripted');
         // $mform->hideIf('speechphrase', 'speechtype', 'eq', 'unscripted');
         // $mform->hideIf('idnumber', 'speechtype', 'eq', 'unscripted');
     }
 
-    private function buildSpeechTypeOptionSelect()
-    {
+    private function build_speech_type_option_select() {
         $option = array();
 
         if (get_config('qtype_lcspeech', 'api_scripted_url')) {
@@ -138,59 +149,57 @@ class qtype_lcspeech_edit_form extends question_edit_form
             $option['pronunciation'] = 'Pronunciation';
         }
 
-        // $url_scripted = get_config('qtype_lcspeech', 'api_scripted_url');
-        // $url_unscripted = get_config('qtype_lcspeech', '');
-        // $url_pronunciation = get_config('qtype_lcspeech', '');
-        // var_dump($url);
-        // exit;
-        // } else if ($speechtype == 'unscripted') {
-        //     $url = get_config('qtype_lcspeech', '');
-        // } else if ($speechtype == 'pronunciation') {
-        //     $url = get_config('qtype_lcspeech', '');
-        // }
+        /* $url_scripted = get_config('qtype_lcspeech', 'api_scripted_url');
+        $url_unscripted = get_config('qtype_lcspeech', '');
+        $url_pronunciation = get_config('qtype_lcspeech', '');
+        var_dump($url);
+        exit;
+        } else if ($speechtype == 'unscripted') {
+            $url = get_config('qtype_lcspeech', '');
+        } else if ($speechtype == 'pronunciation') {
+            $url = get_config('qtype_lcspeech', '');
+        }
 
-        // ['scripted'=>'Scripted', 'unscripted'=>'Unscripted', 'pronunciation'=>'Pronunciation']
+        ['scripted'=>'Scripted', 'unscripted'=>'Unscripted', 'pronunciation'=>'Pronunciation'] */
         return $option;
     }
 
-    private function onChangeQuestionTypeJS()
-    {
-        $content = 'var value = document.getElementById("id_speechtype").value; 
-        console.log("fitem_id_speechphrase value: " + value); 
-        if (value == "unscripted") { 
-            document.getElementById("id_speechphrase").value = "empty"; 
-            document.getElementById("fitem_id_speechphrase").style.display = "none"; 
-            document.getElementById("fitem_id_hascontext").style.display = ""; 
-            document.getElementById("fitem_id_contextquestion").style.display = ""; 
-            document.getElementById("fitem_id_contextdescription").style.display = ""; 
-            document.getElementById("fitem_id_contextvalidanswerdescription").style.display = ""; 
-        } else { 
-            document.getElementById("id_speechphrase").value = ""; 
-            document.getElementById("fitem_id_speechphrase").style.display = ""; 
-            document.getElementById("fitem_id_hascontext").style.display = "none"; 
-            document.getElementById("fitem_id_contextquestion").style.display = "none"; 
-            document.getElementById("fitem_id_contextdescription").style.display = "none"; 
+    private function on_change_question_type_js() {
+        $content = 'var value = document.getElementById("id_speechtype").value;
+        console.log("fitem_id_speechphrase value: " + value);
+        if (value == "unscripted") {
+            document.getElementById("id_speechphrase").value = "empty";
+            document.getElementById("fitem_id_speechphrase").style.display = "none";
+            document.getElementById("fitem_id_hascontext").style.display = "";
+            document.getElementById("fitem_id_contextquestion").style.display = "";
+            document.getElementById("fitem_id_contextdescription").style.display = "";
+            document.getElementById("fitem_id_contextvalidanswerdescription").style.display = "";
+        } else {
+            document.getElementById("id_speechphrase").value = "";
+            document.getElementById("fitem_id_speechphrase").style.display = "";
+            document.getElementById("fitem_id_hascontext").style.display = "none";
+            document.getElementById("fitem_id_contextquestion").style.display = "none";
+            document.getElementById("fitem_id_contextdescription").style.display = "none";
             document.getElementById("fitem_id_contextvalidanswerdescription").style.display = "none";
         }';
         return $content;
     }
 
-    protected function hideFeedbackAndAudio($mform)
-    {
+    protected function hide_feedback_and_audio($mform) {
         // add Feedback
         $mform->addElement('header', 'score_feedback', 'Feedback');
-        $fromRange = array(0, 31, 51, 81);
-        $toRange = array(30, 50, 80, 100);
+        $fromrange = array(0, 31, 51, 81);
+        $torange = array(30, 50, 80, 100);
         for ($i = 0; $i < 4; $i++) {
-            $availableFirstGroup = array();
-            $availableFirstGroup[] = &$mform->createElement('text', "from_range[{$i}]", 'From', 'placeholder="set from range" disabled="true" class="custom-feedback-range"');
-            $availableFirstGroup[] = &$mform->createElement('text', "to_range[{$i}]", 'To', 'placeholder="set to range" disabled="true" class="custom-feedback-range"');
-            $availableFirstGroup[] = &$mform->createElement('textarea', "feedback[{$i}]", 'Feedback', 'wrap="virtual" rows="5" cols="50" class="custom-feedback-textarea"');
+            $availablefirstgroup = array();
+            $availablefirstgroup[] = &$mform->createElement('text', "from_range[{$i}]", 'From', 'placeholder="set from range" disabled="true" class="custom-feedback-range"');
+            $availablefirstgroup[] = &$mform->createElement('text', "to_range[{$i}]", 'To', 'placeholder="set to range" disabled="true" class="custom-feedback-range"');
+            $availablefirstgroup[] = &$mform->createElement('textarea', "feedback[{$i}]", 'Feedback', 'wrap="virtual" rows="5" cols="50" class="custom-feedback-textarea"');
             $mform->setType("from_range[{$i}]", PARAM_INT);
             $mform->setType("to_range[{$i}]", PARAM_INT);
-            $mform->setDefault("from_range[{$i}]", $fromRange[$i]);
-            $mform->setDefault("to_range[{$i}]", $toRange[$i]);
-            $mform->addGroup($availableFirstGroup, 'available_group_{$i}', $i === 0 ? 'Grade Range' : '', '', false);
+            $mform->setDefault("from_range[{$i}]", $fromrange[$i]);
+            $mform->setDefault("to_range[{$i}]", $torange[$i]);
+            $mform->addGroup($availablefirstgroup, 'available_group_{$i}', $i === 0 ? 'Grade Range' : '', '', false);
         }
 
         $mform->setExpanded('score_feedback');
@@ -202,12 +211,14 @@ class qtype_lcspeech_edit_form extends question_edit_form
             $repeatno = count($this->question->options->audios);
         }
 
-        $uploadGroup = [];
-        $uploadGroup[] = &$mform->createElement('select', 'language', 'Language', ['en-US' => 'American', 'en-AU' => 'Australian', 'en-UK' => 'British'], 'class="correction-audio-select"');
-        $uploadGroup[] = &$mform->createElement('filepicker', 'correction_audio', 'Audio', null, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1, 'accepted_types' => array('.mp3', '.wav', '.ogg')));
-        $uploadGroup[] = &$mform->createElement('submit', 'removeaudio', 'Remove');
+        $uploadgroup = [];
+        $uploadgroup[] = &$mform->createElement('select', 'language', 'Language', ['en-US' => 'American', 'en-AU' => 'Australian', 'en-UK' => 'British'],
+        'class="correction-audio-select"');
+        $uploadgroup[] = &$mform->createElement('filepicker', 'correction_audio', 'Audio', null, array('subdirs' => 0, 'maxbytes' => 0, 'maxfiles' => 1,
+        'accepted_types' => array('.mp3', '.wav', '.ogg')));
+        $uploadgroup[] = &$mform->createElement('submit', 'removeaudio', 'Remove');
         $mform->registerNoSubmitButton('removeaudio');
-        $repeatarray[] = $mform->createElement('group', 'audio_upload_group', '', $uploadGroup, null, false);
+        $repeatarray[] = $mform->createElement('group', 'audio_upload_group', '', $uploadgroup, null, false);
 
         $repeateloptions = array();
 
@@ -215,8 +226,7 @@ class qtype_lcspeech_edit_form extends question_edit_form
         $mform->setExpanded('audio_upload');
     }
 
-    public function validation($data, $files)
-    {
+    public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
         // Validate placeholders in the question text.
@@ -225,14 +235,14 @@ class qtype_lcspeech_edit_form extends question_edit_form
             $errors['questiontext'] = $placeholdererrors;
         }
 
-        // Validate the speech phrase.
-        // if (
-        //     !array_key_exists('speechphrase', $data) ||
-        //     !is_string($data['speechphrase']) ||
-        //     strlen($data['speechphrase']) < 1
-        // ) {
-        //     $errors['speechphrase'] = get_string('err_speechphraseempty', 'qtype_lcspeech');
-        // }
+        /* Validate the speech phrase.
+        if (
+            !array_key_exists('speechphrase', $data) ||
+            !is_string($data['speechphrase']) ||
+            strlen($data['speechphrase']) < 1
+        ) {
+            $errors['speechphrase'] = get_string('err_speechphraseempty', 'qtype_lcspeech');
+        } */
 
         // Validate the time.
         $maxtimelimit = get_config('qtype_lcspeech', 'timelimit');
@@ -249,14 +259,12 @@ class qtype_lcspeech_edit_form extends question_edit_form
         return $errors;
     }
 
-    public function qtype()
-    {
+    public function qtype() {
         return 'lcspeech';
     }
 
 
-    protected function data_preprocessing($question)
-    {
+    protected function data_preprocessing($question) {
         if (isset($question->options->range)) {
             $feedback = [];
             foreach ($question->options->range as $range) {
@@ -269,8 +277,6 @@ class qtype_lcspeech_edit_form extends question_edit_form
             $i = 0;
             foreach ($question->options->audios as $audio) {
                 $draftitemid = file_get_submitted_draft_itemid('correction_audio{$i}');
-
-
                 file_prepare_draft_area(
                     $draftitemid,
                     $this->context->id,

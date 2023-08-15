@@ -1,4 +1,18 @@
 <?php
+// This file is part of Moodle - https://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Speech Assessment question type restore handler
@@ -15,23 +29,20 @@ defined('MOODLE_INTERNAL') || die();
  * @package   qtype_lcspeech
  * @copyright 2023 Speech Assessment
  */
-class restore_qtype_lcspeech_plugin extends restore_qtype_plugin
-{
+class restore_qtype_lcspeech_plugin extends restore_qtype_plugin {
     /**
      * Returns the qtype name.
      *
      * @return string The type name
      */
-    protected static function qtype_name()
-    {
+    protected static function qtype_name() {
         return 'lcspeech';
     }
 
     /**
      * Returns the paths to be handled by the plugin at question level
      */
-    protected function define_question_plugin_structure()
-    {
+    protected function define_question_plugin_structure() {
 
         $paths = array();
 
@@ -49,8 +60,7 @@ class restore_qtype_lcspeech_plugin extends restore_qtype_plugin
      *
      * @param array $data
      */
-    public function process_lcspeech($data)
-    {
+    public function process_lcspeech($data) {
         global $DB;
 
         $data = (object)$data;
