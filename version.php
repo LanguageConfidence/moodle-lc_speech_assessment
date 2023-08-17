@@ -23,7 +23,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2023063010;
+$plugin->version   = 2023101710;
 $plugin->requires  = 2020061500;
 $plugin->component = 'qtype_lcspeech';
 $plugin->maturity  = MATURITY_STABLE;
