@@ -1,18 +1,4 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /** @noinspection SqlDialectInspection */
 
@@ -22,19 +8,22 @@ namespace qtype_lcspeech\task;
 
 use core\task\scheduled_task;
 
-class remove_old_files extends scheduled_task {
+class remove_old_files extends scheduled_task
+{
 
     /**
      * @inheritDoc
      */
-    public function get_name() {
+    public function get_name()
+    {
         return get_string('taskremoveoldfiles', 'qtype_lcspeech');
     }
 
     /**
      * @inheritDoc
      */
-    public function execute() {
+    public function execute()
+    {
         global $DB, $CFG;
         require_once($CFG->libdir . '/questionlib.php');
 
@@ -51,14 +40,14 @@ class remove_old_files extends scheduled_task {
             $days = get_config('qtype_lcspeech', 'daysolderaudiofiles');
             mtrace('config daysolderaudiofiles: ' . $days . ' days');
 
-            $this->update_existing_records();
+            $this->updateExistingRecords();
 
-            // delete old files
+            /**delete old files **/
             $dbtype = $CFG->dbtype;
-            // $oldfiles;
+            // $oldFiles;
             mtrace('DB Type : ' . $dbtype);
             if ($dbtype == 'pgsql') {
-                $oldfiles = $DB->get_records_sql(
+                $oldFiles = $DB->get_records_sql(
                     "
                         SELECT *
                         FROM {files} f
@@ -72,13 +61,13 @@ class remove_old_files extends scheduled_task {
                     )
                 );
             } else {
-                $oldfiles = $DB->get_records_sql("
+                $oldFiles = $DB->get_records_sql("
                     SELECT *
                     FROM {files} f
                     WHERE DATE(FROM_UNIXTIME(f.timecreated)) <= DATE_SUB(CURDATE(), INTERVAL " . $days . " DAY) AND f.filearea=?", ['response_recording']);
             }
             $count = 0;
-            foreach ($oldfiles as $f) {
+            foreach ($oldFiles as $f) {
                 $file = $fs->get_file($f->contextid, $f->component, $f->filearea, $f->itemid, $f->filepath, $f->filename);
                 if ($file) {
                     mtrace('begin delete file : ' . $f->filename . ', path: ' . $f->filepath);
@@ -93,17 +82,18 @@ class remove_old_files extends scheduled_task {
         mtrace('END execute remove old files');
     }
 
-    private function update_existing_records() {
-        mtrace('START update_existing_records');
+    private function updateExistingRecords()
+    {
+        mtrace('START updateExistingRecords');
         global $DB, $CFG;
         $fs = get_file_storage();
-        // get al files where file area is response_recording
+        /** get al files where file area is response_recording */
 
-        $allfilesrecord;
+        $allFilesRecord;
         $dbtype = $CFG->dbtype;
         $days = get_config('qtype_lcspeech', 'daysolderaudiofiles');
         if ($dbtype == 'pgsql') {
-            $allfilesrecord = $DB->get_records_sql(
+            $allFilesRecord = $DB->get_records_sql(
                 "
                     SELECT *
                     FROM {files} f
@@ -117,24 +107,24 @@ class remove_old_files extends scheduled_task {
                 )
             );
         } else {
-            $allfilesrecord = $DB->get_records_sql("
+            $allFilesRecord = $DB->get_records_sql("
                 SELECT *
                 FROM {files} f
                 WHERE DATE(FROM_UNIXTIME(f.timecreated)) <= DATE_SUB(CURDATE(), INTERVAL " . $days . " DAY) AND f.filearea=?", ['response_recording']);
         }
 
-        if (!isset($allfilesrecord)) {
+        if (!isset($allFilesRecord)) {
             return null;
         }
 
-        mtrace('begin check existing records, number: ' . count($allfilesrecord));
-        foreach ($allfilesrecord as $afiles) {
-            mtrace('start process itemid: ' . $afiles->itemid . ', filename: ' . $afiles->filename);
-            $file = $fs->get_file($afiles->contextid, $afiles->component, $afiles->filearea, $afiles->itemid, $afiles->filepath, $afiles->filename);
-            $attemptstepid = $afiles->itemid;
-            $lastattemptid = $this->get_attempt_id_using_step_id($attemptstepid);
-            $questionid = $this->get_question_id($lastattemptid);
-            $sentence = $this->get_sentence($questionid);
+        mtrace('begin check existing records, number: ' . count($allFilesRecord));
+        foreach ($allFilesRecord as $aFiles) {
+            mtrace('start process itemid: ' . $aFiles->itemid . ', filename: ' . $aFiles->filename);
+            $file = $fs->get_file($aFiles->contextid, $aFiles->component, $aFiles->filearea, $aFiles->itemid, $aFiles->filepath, $aFiles->filename);
+            $attemptStepId = $aFiles->itemid;
+            $lastAttemptId = $this->getAttemptIdUsingStepId($attemptStepId);
+            $questionId = $this->getQuestionId($lastAttemptId);
+            $sentence = $this->getSentence($questionId);
 
             if (!isset($sentence)) {
                 continue;
@@ -147,60 +137,62 @@ class remove_old_files extends scheduled_task {
                 "audio_base64" => base64_encode($file->get_content())
             );
 
-            $payloadkeys = array_keys($payload);
-            sort($payloadkeys);
-            $payloadhash = hash('sha256', json_encode(
+            $payload_keys = array_keys($payload);
+            sort($payload_keys);
+            $payload_hash = hash('sha256', json_encode(
                 array_map(function ($key) use ($payload) {
                     return array($key => $payload[$key]);
-                }, $payloadkeys)
+                }, $payload_keys)
             ));
-            $apiresults = $DB->get_record_sql(
+            $apiResults = $DB->get_record_sql(
                 "
                     SELECT response_json
                     FROM {qtype_lcspeech_api_results}
-                    WHERE payloadhash = :payloadhash
+                    WHERE payload_hash = :payload_hash
                     ORDER BY createdat DESC
                     LIMIT 1
                 ",
                 array(
-                    'payloadhash' => $payloadhash
+                    'payload_hash' => $payload_hash
                 )
             );
-            if (!isset($apiresults)) {
-                mtrace('not found : ' . $attemptstepid);
+            if (!isset($apiResults)) {
+                mtrace('not found : ' . $attemptStepId);
                 continue;
             }
 
-            mtrace('end process itemid: ' . $afiles->itemid . ', filename: ' . $afiles->filename);
-            // $payloadunique = $this->get_hash_identifier($attemptstepid, $lastattemptid, $questionid);
-            // if($payloadunique) {
-            // $compare_scale_clause = $DB->sql_compare_text('payloadhash')  . ' = ' . $DB->sql_compare_text(':payloadhash');
-            // $DB->set_field_select("qtype_lcspeech_api_results", 'unique_hash_identifier', $payloadunique, $compare_scale_clause, array('payloadhash'=>$payloadhash));
+            mtrace('end process itemid: ' . $aFiles->itemid . ', filename: ' . $aFiles->filename);
+            // $payloadUnique = $this->getHashIdentifier($attemptStepId, $lastAttemptId, $questionId);
+            // if($payloadUnique) {
+            //     $compare_scale_clause = $DB->sql_compare_text('payload_hash')  . ' = ' . $DB->sql_compare_text(':payload_hash');
+            //     $DB->set_field_select("qtype_lcspeech_api_results", 'unique_hash_identifier', $payloadUnique, $compare_scale_clause, array('payload_hash'=>$payload_hash));
             // }
         }
 
-        mtrace('END update_existing_records');
+        mtrace('END updateExistingRecords');
     }
 
-    private function get_hash_identifier($attemptstepid, $lastattemptid, $questionid) {
+    private function getHashIdentifier($attemptStepId, $lastAttemptId, $questionId)
+    {
 
-        if (!$attemptstepid || !$lastattemptid || !$questionid) {
+        if (!$attemptStepId || !$lastAttemptId || !$questionId) {
             return null;
         }
 
-        $payloadunique = array(
-            "question_id" => (string)$questionid,
-            "attempt_id" => (string)$lastattemptid,
-            "step_id" => (string)$attemptstepid
+        $payloadUnique = array(
+            "question_id" => (string)$questionId,
+            "attempt_id" => (string)$lastAttemptId,
+            "step_id" => (string)$attemptStepId
         );
 
-        return  $this->get_payload_hash($payloadunique);
+        return  $this->getPayloadHash($payloadUnique);
     }
 
-    private function get_sentence($questionid) {
-        mtrace('start get_sentence: ' . $questionid);
+    private function getSentence($questionId)
+    {
+        mtrace('start getSentence: ' . $questionId);
         global $DB;
-        $dbrecord = $DB->get_record_sql(
+        $db_record = $DB->get_record_sql(
             "
                 SELECT speechphrase
                 FROM {qtype_lcspeech_options}
@@ -208,20 +200,21 @@ class remove_old_files extends scheduled_task {
                 LIMIT 1
             ",
             array(
-                'id' => $questionid,
+                'id' => $questionId,
             )
         );
-        if ($dbrecord) {
-            mtrace('end get_sentence: ' . $questionid . ', result: ' . $dbrecord->speechphrase);
-            return  $dbrecord->speechphrase;
+        if ($db_record) {
+            mtrace('end getSentence: ' . $questionId . ', result: ' . $db_record->speechphrase);
+            return  $db_record->speechphrase;
         }
         return null;
     }
 
-    private function get_question_id($attemptid) {
-        mtrace('start get_question_id: ' . $attemptid);
+    private function getQuestionId($attemptId)
+    {
+        mtrace('start getQuestionId: ' . $attemptId);
         global $DB;
-        $dbrecord = $DB->get_record_sql(
+        $db_record = $DB->get_record_sql(
             "
                 SELECT questionid
                 FROM {question_attempts}
@@ -229,21 +222,22 @@ class remove_old_files extends scheduled_task {
                 LIMIT 1
             ",
             array(
-                'id' => $attemptid,
+                'id' => $attemptId,
             )
         );
 
-        if ($dbrecord) {
-            mtrace('end get_question_id: ' . $attemptid);
-            return  json_decode($dbrecord->questionid, true);
+        if ($db_record) {
+            mtrace('end getQuestionId: ' . $attemptId);
+            return  json_decode($db_record->questionid, true);
         }
         return null;
     }
 
-    private function get_attempt_id_using_step_id($stepid) {
-        mtrace('start get_attempt_id_using_step_id: ' . $stepid);
+    private function getAttemptIdUsingStepId($stepId)
+    {
+        mtrace('start getAttemptIdUsingStepId: ' . $stepId);
         global $DB;
-        $dbrecord = $DB->get_record_sql(
+        $db_record = $DB->get_record_sql(
             "
                 SELECT questionattemptid
                 FROM {question_attempt_steps}
@@ -251,21 +245,22 @@ class remove_old_files extends scheduled_task {
                 LIMIT 1
             ",
             array(
-                'id' => $stepid,
+                'id' => $stepId,
             )
         );
-        if ($dbrecord) {
-            mtrace('end get_attempt_id_using_step_id: ' . $stepid . ', result :' . json_decode($dbrecord->questionattemptid, true));
-            return json_decode($dbrecord->questionattemptid, true);
+        if ($db_record) {
+            mtrace('end getAttemptIdUsingStepId: ' . $stepId . ', result :' . json_decode($db_record->questionattemptid, true));
+            return json_decode($db_record->questionattemptid, true);
         }
         return null;
     }
 
-    private function get_payload_hash($payload) {
-        $payloadkeys = array_keys($payload);
-        sort($payloadkeys);
+    private function getPayloadHash($payload)
+    {
+        $payload_keys = array_keys($payload);
+        sort($payload_keys);
         return hash('sha256', json_encode(array_map(static function ($key) use ($payload) {
             return array($key => $payload[$key]);
-        }, $payloadkeys), JSON_THROW_ON_ERROR));
+        }, $payload_keys), JSON_THROW_ON_ERROR));
     }
 }
