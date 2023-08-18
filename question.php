@@ -241,7 +241,8 @@ class qtype_lcspeech_question extends question_graded_automatically
         $header = array(
             'Content-Type: application/json',
             'x-blobr-key: ' . $api_key,
-            'x-user-id:' . $USER->id
+            'x-user-id:' . $this->get_current_hostname() . '-' . $USER->id,
+            'lc-custom-moodle-instance-hostname:' . $this->get_current_hostname()
         );
         // check setting lc-beta-features
         if (get_config('qtype_lcspeech', 'enablelcbetafeatures')) {
@@ -374,5 +375,18 @@ class qtype_lcspeech_question extends question_graded_automatically
             $args,
             $forcedownload
         );
+    }
+
+    public function get_current_hostname()
+    {
+        $server_name = $_SERVER['SERVER_NAME'];
+
+        if (!in_array($_SERVER['SERVER_PORT'], [80, 443])) {
+            $port = ":$_SERVER[SERVER_PORT]";
+        } else {
+            $port = '';
+        }
+
+        return $server_name . $port;
     }
 }
