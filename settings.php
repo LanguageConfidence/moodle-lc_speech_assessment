@@ -1,18 +1,4 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Admin settings for the Speech Assessment question type.
@@ -20,10 +6,10 @@
  * @package   qtype_lcspeech
  * @copyright 2023 Speech Assessment
  */
-defined('MOODLE_INTERNAL') || die();
-
 require_once($CFG->dirroot . '/question/type/lcspeech/lcspeech_admin_setting_configduration.php');
 require_once($CFG->dirroot . '/question/type/lcspeech/lcspeech_admin_setting_configtext.php');
+
+defined('MOODLE_INTERNAL') || die();
 
 if ($ADMIN->fulltree) {
     global $CFG;
@@ -54,7 +40,7 @@ if ($ADMIN->fulltree) {
         8
     ));
 
-    // other settings
+    //other settings
     $settings->add(new admin_setting_heading('speech_assessment_scripted_settings_heading', get_string('speech_assessment_scripted_settings_heading', 'qtype_lcspeech'), ''));
     $settings->add(new lcspeech_admin_setting_configtext('qtype_lcspeech/api_scripted_url', get_string('api_scripted_url', 'qtype_lcspeech'), '', ''));
 
@@ -64,8 +50,7 @@ if ($ADMIN->fulltree) {
     $settings->add(new lcspeech_admin_setting_configtext('qtype_lcspeech/api_unscripted_url', get_string('api_unscripted_url', 'qtype_lcspeech'), '', ''));
 
     // Pronunciation settings
-    $settings->add(new admin_setting_heading('speech_assessment_pronunciation_settings_heading',
-                    get_string('speech_assessment_pronunciation_settings_heading', 'qtype_lcspeech'), ''));
+    $settings->add(new admin_setting_heading('speech_assessment_pronunciation_settings_heading', get_string('speech_assessment_pronunciation_settings_heading', 'qtype_lcspeech'), ''));
     $settings->add(new lcspeech_admin_setting_configtext(
         'qtype_lcspeech/api_pronunciation_url',
         get_string('api_pronunciation_url', 'qtype_lcspeech'),
