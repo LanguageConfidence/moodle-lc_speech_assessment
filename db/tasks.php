@@ -32,5 +32,14 @@ $tasks = array(
         'day' => '*',
         'month' => '*',
         'dayofweek' => '*'
+    ),
+    array(
+        'classname' => 'qtype_lcspeech\task\migrate_to_lcspeech',
+        'blocking' => 0,
+        'minute' => 0,
+        'hour' => 0,
+        'day' => 0,
+        'month' => 0,
+        'dayofweek' => '*'
     )
 );
