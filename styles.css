@@ -134,47 +134,47 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     text-align: center;
 }
 
-.custom-feedback-range label.col-form-label {
+.que.lcspeech .custom-feedback-range label.col-form-label {
     width: 100% !important;
     display: inline-block;
 }
 
-.custom-feedback-range input,
-.custom-feedback-range span {
+.que.lcspeech .custom-feedback-range input,
+.que.lcspeech .custom-feedback-range span {
     width: 100% !important;
 }
 
-.custom-feedback-range {
+.que.lcspeech .custom-feedback-range {
     margin-bottom: 15px;
 }
 
-.form-group.fitem.custom-feedback-range {
+.que.lcspeech .form-group.fitem.custom-feedback-range {
     width: 50%;
     margin: 0 0 15px !important;
     padding: 0 10px;
 }
 
-.custom-feedback-textarea {
+.que.lcspeech .custom-feedback-textarea {
     width: calc(100% - 20px);
     margin: 0 10px;
 }
 
-.custom-feedback-range+label.accesshide {
+.que.lcspeech .custom-feedback-range+label.accesshide {
     position: relative;
     height: auto;
     width: auto;
     padding: 0 10px;
 }
 
-.correction-audio-select {
+.que.lcspeech .correction-audio-select {
     padding-bottom: 20px;
 }
 
-.custom-media .mediaplugin>div {
+.que.lcspeech .custom-media .mediaplugin>div {
     margin: 0 !important;
 }
 
-p.note {
+.que.lcspeech p.note {
     background-color: #f0f7fb;
     border-left: solid 4px #3498db;
     line-height: 18px;
@@ -185,7 +185,7 @@ p.note {
     font-weight: 400 !important;
 }
 
-.cbtn {
+.que.lcspeech .cbtn {
     width: 100% !important;
     text-align: left !important;
     position: relative !important;
@@ -195,7 +195,7 @@ p.note {
     align-items: center;
 }
 
-.cbtn:before {
+.que.lcspeech .cbtn:before {
     content: '' !important;
     display: block !important;
     width: 10px !important;
@@ -206,39 +206,39 @@ p.note {
     margin: 0 10px 4px 1px;
 }
 
-.cbtn[aria-expanded="true"]:after {
+.que.lcspeech .cbtn[aria-expanded="true"]:after {
     transform: rotate(135deg);
 }
 
-.cbtn:focus {
+.que.lcspeech .cbtn:focus {
     outline: none !important;
     box-shadow: none !important;
 }
 
-.que .outcome {
+.que.lcspeech .outcome {
     background-color: #fcfcfc !important;
     border-color: #fcfcfc !important;
 }
 
-.qtext p {
+.que.lcspeech .qtext p {
     font-size: 18px;
     font-weight: bold;
 }
 
-#id_score_feedback {
+.que.lcspeech #id_score_feedback {
     display: none;
 }
 
-#id_audio_upload {
+.que.lcspeech #id_audio_upload {
     display: none;
 }
 
-.fb-main {
+.que.lcspeech .fb-main {
     border-left: 3px #0fa1bfe3 solid;
     padding-left: 5px;
 }
 
-.fb-title-container {
+.que.lcspeech .fb-title-container {
     border-bottom: 1px solid #00000040;
     margin-bottom: 10px;
 }
@@ -291,29 +291,29 @@ p.note {
     position: relative;
 }
 
-.metadata-table {
+.que.lcspeech .metadata-table {
     font-size: 15px;
 }
 
-.metadata-table th {
+.que.lcspeech .metadata-table th {
     border: 1px solid #DEE2E6;
     text-align: center;
 
 }
 
-.metadata-table th:nth-last-child(-n+1) {
+.que.lcspeech .metadata-table th:nth-last-child(-n+1) {
     border: 1px solid #DEE2E6;
     text-align: center;
     color: #0056B3;
 }
 
-.metadata-table td {
+.que.lcspeech .metadata-table td {
     border: 1px solid #DEE2E6;
     text-align: center;
     font-weight: bold;
 }
 
-.metadata-table td:nth-last-child(-n+1) {
+.que.lcspeech .metadata-table td:nth-last-child(-n+1) {
     border: 1px solid #DEE2E6;
     text-align: center;
     font-weight: bold;
@@ -392,7 +392,7 @@ p.note {
     color: #212529
 }
 
-.speaking-score-mock {
+.que.lcspeech .speaking-score-mock {
     float: right;
     color: black;
     font-size: 14px;
@@ -400,7 +400,7 @@ p.note {
 }
 
 /* fluency feedbacl transcript*/
-.c-feedback {
+.que.lcspeech .c-feedback {
     border-radius: 50%;
     width: 22px;
     height: 22px;
@@ -412,42 +412,42 @@ p.note {
     display: inline-block !important;
     margin-right: 10px;
 }
-.discourse-marker {
+.que.lcspeech .discourse-marker {
 	background: #CDD7FF;
 }
-.word-repetition {
+.que.lcspeech .word-repetition {
 	background: #AEF3FE;
 }
-.filler-word {
+.que.lcspeech .filler-word {
 	background: #FDDBB2;
 }
-.speech-pause {
+.que.lcspeech .speech-pause {
 	background: #FFD3D9;
 }
 
-discourse-marker {
+.que.lcspeech discourse-marker {
 	background: #CDD7FF;
     position: relative;
 }
-word-repetition {
+.que.lcspeech word-repetition {
 	background: #AEF3FE;
     position: relative;
 }
-filler-word {
+.que.lcspeech filler-word {
 	background: #FDDBB2;
     position: relative;
 }
-speech-pause {
+.que.lcspeech speech-pause {
 	background: #FFD3D9;
     position: relative;
 }
 
-.t-tooltips span {
+.que.lcspeech .t-tooltips span {
   display: none;
   left: 0;
 }
 
-.t-tooltips:hover span {
+.que.lcspeech .t-tooltips:hover span {
   display: block;
   position: absolute;
   bottom: 1.5em;
@@ -461,42 +461,42 @@ speech-pause {
   box-shadow: 5px 5px 5px #80808052;
 }
 
-.t-tooltips span .t-title {
+.que.lcspeech .t-tooltips span .t-title {
 	padding: 5px 0px 0px 10px;
 	color: #637381;
 	line-height: 150%;
 	font-weight: 400;
 }
 
-.t-tooltips span .t-content {
+.que.lcspeech .t-tooltips span .t-content {
     padding: 5px 0px 5px 10px;
     line-height: 150%;
     font-weight: bold;
 }
 
-.unscript-speaking-table {
+.que.lcspeech .unscript-speaking-table {
     font-size: 15px;
 }
 
-.unscript-speaking-table th {
+.que.lcspeech .unscript-speaking-table th {
     border: 1px solid #DEE2E6;
     text-align: center;
 
 }
 
-.unscript-speaking-table th.txt-last {
+.que.lcspeech .unscript-speaking-table th.txt-last {
     border: 1px solid #DEE2E6;
     text-align: center;
     color: #0056B3;
 }
 
-.unscript-speaking-table td {
+.que.lcspeech .unscript-speaking-table td {
     border: 1px solid #DEE2E6;
     text-align: center;
     font-weight: bold;
 }
 
-.unscript-speaking-table td.txt-last {
+.que.lcspeech .unscript-speaking-table td.txt-last {
     border: 1px solid #DEE2E6;
     text-align: center;
     font-weight: bold;
