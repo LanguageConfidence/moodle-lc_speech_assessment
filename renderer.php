@@ -295,7 +295,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
                 $feedbackpronuncation = $this->build_pronunciation_feedback($result['words']);
 
-                $allfeedback .= '<div><div class="qtype_lcspeech_average_score">Overall score: ' . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechphrase . '</div>';
+                $allfeedback .= '<div><div class="qtype_lcspeech_average_score">' . get_string('lbl_overallscore', 'qtype_lcspeech') . ': ' . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechphrase . '</div>';
 
                 $allfeedback .= '</div>';
                 $allfeedback .= $this->render_tabs($question);
@@ -339,7 +339,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                 $feedbackpronuncation = $this->build_pronunciation_feedback($result['pronunciation']['words']);
 
                 // Speaking score
-                $allfeedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">Speaking score';
+                $allfeedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;"><div class="section-header qtype_lcspeech_average_score">' . get_string('lbl_speakingscore', 'qtype_lcspeech');
                 $allfeedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score_scripted($result, $question);
                 $allfeedback .= $speakingscore;
@@ -416,7 +416,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
                 // Speaking score unscripted
                 $allfeedback .= '<div><div class="box-border" style="padding: 0 24px 0 24px; margin-bottom: 10px;">
-                        <div class="section-header qtype_lcspeech_average_score">Speaking score';
+                        <div class="section-header qtype_lcspeech_average_score">' . get_string('lbl_speakingscore', 'qtype_lcspeech');
                 $allfeedback .= '<span style="float: right;color: black;font-size: 14px;padding-top: 10px;">' . $this->get_config_scoring_option_display($question) . '</span></div>';
                 $speakingscore = $this->render_speaking_score_unscripted($result, $question);
                 $allfeedback .= $speakingscore;
@@ -489,11 +489,11 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             switch ($title) {
                 case 'Connective':
                     $vmakers = $d->attributes->item(0)->value;
-                    $content = "Used for: " . $vmakers;
+                    $content = get_string('lbl_usedfor', 'qtype_lcspeech') . ": " . $vmakers;
                     break;
                 case 'Speech pause':
                     $vmakers = $d->attributes->item(0)->value;
-                    $content = "Duration seconds: " . $vmakers;
+                    $content = get_string('lbl_durationseconds', 'qtype_lcspeech') . ": " . $vmakers;
                     break;
                 default:
                     break;
@@ -518,16 +518,20 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         libxml_use_internal_errors(true);
         $dom->loadHTML($taggedfeedback);
         $discoursemarkers = $dom->getElementsByTagName("discourse-marker");
-        $this->fluency_feedback_transcript_append_child($dom, $discoursemarkers, "Connective", null);
+        $this->fluency_feedback_transcript_append_child($dom, $discoursemarkers
+            , get_string('lbl_connectives', 'qtype_lcspeech'), null);
 
         $fillerword = $dom->getElementsByTagName("filler-word");
-        $this->fluency_feedback_transcript_append_child($dom, $fillerword, "Filler word", "Used for: filler word");
+        $this->fluency_feedback_transcript_append_child($dom, $fillerword
+            , get_string('lbl_fillerword', 'qtype_lcspeech'), get_string('lbl_usedforfillerword', 'qtype_lcspeech'));
 
         $wordrepetition = $dom->getElementsByTagName("word-repetition");
-        $this->fluency_feedback_transcript_append_child($dom, $wordrepetition, "Word repetition", "Used for: Word repetition");
+        $this->fluency_feedback_transcript_append_child($dom, $wordrepetition
+            , get_string('lbl_wordrepetition', 'qtype_lcspeech'), get_string('lbl_usedforwordrepetition', 'qtype_lcspeech'));
 
         $speechpause = $dom->getElementsByTagName("speech-pause");
-        $this->fluency_feedback_transcript_append_child($dom, $speechpause, "Speech pause", null);
+        $this->fluency_feedback_transcript_append_child($dom, $speechpause
+            , get_string('lbl_speechpause', 'qtype_lcspeech'), null);
 
         return $dom->saveHTML();
     }
@@ -535,21 +539,21 @@ class qtype_lcspeech_renderer extends qtype_renderer {
     protected function feedback_fluency($response, $question) {
         $content = '<div class="feedback-card box-border">
                 <div>
-                    <span class="bold-text">Speech Rate</span>
+                    <span class="bold-text">' . get_string('lbl_speechrate', 'qtype_lcspeech') . '</span>
                     <span>'  . $response['fluency']['metrics']['speech_rate'] . '</span>
                 </div>
                 <div>' . $response['fluency']['feedback']['speech_rate']['feedback_text'] . '</div>
             </div>
             <div class="feedback-card box-border">
                 <div >
-                    <span class="bold-text">Number of pauses</span>
+                    <span class="bold-text">' . get_string('lbl_numberofpauses', 'qtype_lcspeech') . '</span>
                     <span>'  . $response['fluency']['metrics']['pauses'] . '</span>
                 </div>
                 <div>' . $response['fluency']['feedback']['pauses']['feedback_text'] . '</div>
             </div>
             <div class="feedback-card box-border">
                 <div >
-                    <span class="bold-text">Number of filler words</span>
+                    <span class="bold-text">' . get_string('lbl_numberoffillerwords', 'qtype_lcspeech') . '</span>
                     <span>'  . $response['fluency']['metrics']['filler_words'] . '</span>
                 </div>
                 <div>' . $response['fluency']['feedback']['filler_words']['feedback_text'] . '</div>
@@ -566,19 +570,19 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             $taggedfeedback = $this->build_fluency_feedback_transcript($taggedfeedback);
             $content .= '<div class="feedback-card box-border">
                     <div >
-                        <span class="bold-text">Tagged transcript</span>
+                        <span class="bold-text">' . get_string('lbl_taggedtranscript', 'qtype_lcspeech') . '</span>
                         <div style="margin-top: 0px;">
                             <div style="display: contents;margin-right: 5px;">
-                                <div class="c-feedback discourse-marker">' . $iconnective . '</div> Connectives&nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="c-feedback discourse-marker">' . $iconnective . '</div> ' . get_string('lbl_connectives', 'qtype_lcspeech') . '&nbsp;&nbsp;&nbsp;&nbsp;
                             </div>
                             <div style="display: contents;margin-right: 5px;">
-                                <div class="c-feedback word-repetition">' . $ifillerword . '</div> Word repetitions&nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="c-feedback word-repetition">' . $ifillerword . '</div> ' . get_string('lbl_wordrepetition', 'qtype_lcspeech') . '&nbsp;&nbsp;&nbsp;&nbsp;
                             </div>
                             <div style="display: contents;margin-right: 5px;">
-                                <div class="c-feedback filler-word">' . $iwordrepetition . '</div> Filler word&nbsp;&nbsp;&nbsp;&nbsp;
+                                <div class="c-feedback filler-word">' . $iwordrepetition . '</div> ' . get_string('lbl_fillerword', 'qtype_lcspeech') . '&nbsp;&nbsp;&nbsp;&nbsp;
                             </div>
                             <div style="display: contents;">
-                                <div class="c-feedback speech-pause">' . $ispeechpause . '</div> Pauses
+                                <div class="c-feedback speech-pause">' . $ispeechpause . '</div>' . get_string('lbl_pauses', 'qtype_lcspeech') . '
                             </div>
                         </div>
                     </div>
@@ -605,7 +609,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabMetaFeedback-' . $question->id . '">
                     <button class="nav-link active" data-toggle="tab" data-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
-                        Content relevance
+                        ' . get_string('lbl_contentrelevance', 'qtype_lcspeech')  . '
                     </button>
                 </li>
             ';
@@ -613,7 +617,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         $tabs .= '
             <li class="nav-item" role="presentation" id="tabPro2Feedback-' . $question->id . '">
                 <button class="nav-link' . ($enablemetadata ? '' : ' active') . '" data-toggle="tab" data-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($enablemetadata ? '"false"' : '"true"') . '>
-                    Pronunciation
+                    ' . get_string('lbl_pronunciation', 'qtype_lcspeech')  . '
                 </button>
             </li>
         ';
@@ -622,7 +626,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabFluency-' . $question->id . '">
                     <button class="nav-link" data-toggle="tab" data-target="#collapseFluency' . $question->id . '" type="button" role="tab" aria-controls="collapseFluency' . $question->id . '" aria-selected="false">
-                        Fluency feedback
+                        ' . get_string('lbl_fluencyfeedback', 'qtype_lcspeech')  . '
                     </button>
                 </li>
             ';
@@ -633,7 +637,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                 $tabs .= '
                     <li class="nav-item" role="presentation" id="tabGrammar-' . $question->id . '">
                         <button class="nav-link" data-toggle="tab" data-target="#collapseGrammar' . $question->id . '" type="button" role="tab" aria-controls="collapseGrammar' . $question->id . '" aria-selected="false">
-                            Grammar feedback
+                            ' . get_string('lbl_grammarfeedback', 'qtype_lcspeech')  . '
                         </button>
                     </li>
                 ';
@@ -641,7 +645,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabVocabulary-' . $question->id . '">
                     <button class="nav-link" data-toggle="tab" data-target="#collapseVocabulary' . $question->id . '" type="button" role="tab" aria-controls="collapseVocabulary' . $question->id . '" aria-selected="false">
-                        Vocabulary feedback
+                        ' . get_string('lbl_vocabularyfeedback', 'qtype_lcspeech')  . '
                     </button>
                 </li>
             ';
@@ -657,15 +661,15 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if ($question->speechtype == 'scripted') {
             $content = '
                 <div class="metadata-card box-border">
-                    <div><span class="bold-text">Predicted text</span></div>
+                    <div><span class="bold-text">' . get_string('lbl_vocabularyfeedback', 'qtype_lcspeech') . '</span></div>
                     <div>' . $response['metadata']['predicted_text'] . '</div>
                 </div>
                 <div class="metadata-card box-border">
-                    <div><span class="bold-text">Expected text</span></div>
+                    <div><span class="bold-text">' . get_string('lbl_expectedtext', 'qtype_lcspeech') . '</span></div>
                     <div>' . $response['pronunciation']['expected_text'] . '</div>
                 </div>
                 <div class="metadata-card box-border">
-                    <div><span class="bold-text">Relevance score</span></div>
+                    <div><span class="bold-text">' . get_string('lbl_relevancescore', 'qtype_lcspeech') . '</span></div>
                     <div>' . $response['metadata']['content_relevance'] . '</div>
                 </div>
             ';
@@ -674,7 +678,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if ($question->speechtype == 'unscripted') {
             $content = '
                 <div class="feedback-card box-border">
-                    <div><span class="bold-text">The predicted text</span></div>
+                    <div><span class="bold-text">' . get_string('lbl_thepredictedtext', 'qtype_lcspeech') . '</span></div>
                     <div>' . $response['metadata']['predicted_text'] . '</div>
                 </div>
             ';
@@ -684,7 +688,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                 $content .= '
                     <div class="feedback-card box-border">
                         <div>
-                            <span class="bold-text">Unscripted content relevance score</span>
+                            <span class="bold-text">' . get_string('lbl_thepredictedtext', 'qtype_lcspeech') . '</span>
                             <span class="' . $labelstyle . '">' . ucwords(strtolower(str_replace("_", " ", $response['metadata']['content_relevance']))) . '</span>
                         </div>
                         <div>' . $response['metadata']['content_relevance_feedback'] . '</div>
@@ -697,7 +701,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
                 $content .= '
                     <div class="metadata-card box-border">
-                        <div><span class="bold-text">Valid answer</span></div>
+                        <div><span class="bold-text">' . get_string('lbl_validanswer', 'qtype_lcspeech') . '</span></div>
                         <div>' . $validanswer . '</div>
                     </div>
                 ';
@@ -713,7 +717,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if (isset($result['grammar']['metrics']['mistake_count'])) {
             $content .= '<div class="feedback-card box-border">
                     <div>
-                        <span class="bold-text">Grammar mistake count</span>
+                        <span class="bold-text">' . get_string('lbl_grammarmistakeccount', 'qtype_lcspeech') . '</span>
                         <span>' . $result['grammar']['metrics']['mistake_count'] . '</span>
                     </div>
                 </div>
@@ -723,7 +727,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if (isset($result['grammar']['metrics']['grammatical_complexity'])) {
             $content .= '<div class="feedback-card box-border">
                     <div>
-                        <span class="bold-text">Grammatical complexity</span>
+                        <span class="bold-text">' . get_string('lbl_grammaticalcomplexity', 'qtype_lcspeech') . '<</span>
                         <span class="' . $labelstyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
                     </div>
                 </div>
@@ -748,7 +752,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         $content = '';
         $content .= '<div class="feedback-card box-border">
                 <div>
-                    <span class="bold-text">Vocabulary complexity</span>
+                    <span class="bold-text">' . get_string('lbl_vocabularycomplexity', 'qtype_lcspeech') . '</span>
                     <span class="' . $labelstyle . '">' . ucwords(strtolower($result['vocabulary']['metrics']['vocabulary_complexity'])) . '</span>
                 </div>
             </div>
@@ -767,9 +771,9 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         $feedback .= '<table style="table-layout: fixed ; width: 100%;" class="generaltable generalbox quizreviewsummary metadata-table">';
         $feedback .= '<tbody>';
         $feedback .= '<tr>
-                        <th scope="row">Fluency</th>
-                        <th scope="row">Pronunciation</th>
-                        <th scope="row">Overall</th>
+                        <th scope="row">' . get_string('lbl_fluency', 'qtype_lcspeech') . '</th>
+                        <th scope="row">' . get_string('lbl_pronunciation', 'qtype_lcspeech') . '</th>
+                        <th scope="row">' . get_string('lbl_overall', 'qtype_lcspeech') . '</th>
                     </tr>';
         if ($this->get_config_scoring_option($question) == 'DEFAULT') {
             $feedback .= '<tr>
@@ -821,13 +825,13 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         $config = "";
         switch ($scoringoption) {
             case "PTE":
-                $config = "Mock PTE";
+                $config = get_string('lbl_mockpte', 'qtype_lcspeech');
                 break;
             case "CEFR":
-                $config = "Mock CEFR";
+                $config = get_string('lbl_mockcefr', 'qtype_lcspeech');
                 break;
             case "IELTS":
-                $config = "Mock IELTS";
+                $config = get_string('lbl_mockielts', 'qtype_lcspeech');
                 break;
             case "LC":
             default:
@@ -842,13 +846,13 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         $feedback .= '<table class="generaltable generalbox quizreviewsummary unscript-speaking-table">';
         $feedback .= '<tbody>';
         $feedback .= '<tr>
-                        <th scope="row">Pronunciation</th>
-                        <th scope="row">Fluency</th>
-                        <th scope="row">Vocabulary</th>
-                        <th scope="row">Grammar</th>
+                        <th scope="row">' . get_string('lbl_pronunciation', 'qtype_lcspeech') .'</th>
+                        <th scope="row">' . get_string('lbl_fluency', 'qtype_lcspeech') .'</th>
+                        <th scope="row">' . get_string('lbl_vocabulary', 'qtype_lcspeech') .'</th>
+                        <th scope="row">' . get_string('lbl_grammar', 'qtype_lcspeech') .'</th>
                     ';
         if (isset($result['overall']['overall_score'])) {
-            $feedback .= '<th scope="row" class="txt-last">Overall</th>';
+            $feedback .= '<th scope="row" class="txt-last">' . get_string('lbl_overall', 'qtype_lcspeech') .'</th>';
         }
         $feedback .= '</tr>';
 
@@ -919,9 +923,9 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                                         <div class="card-header" id="headingTwo">
                                           <h5 class="mb-0">
                                             <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                              Sample Answer
+                                              '. get_string('lbl_sampleanswer', 'qtype_lcspeech') .'
                                             </button>
-                                            <span><p class="note">Note: You should try your best before clicking here</p></span>
+                                            <span><p class="note">'. get_string('lbl_sampleanswer_desc', 'qtype_lcspeech') .'</p></span>
                                           </h5>
                                         </div>
 
@@ -930,7 +934,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         }
 
         if (!empty($this->urls)) {
-            $output .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_average_score">Correct Audio</div><div>' . $this->getCorretionAudios($this->urls) . '</div>';
+            $output .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_average_score">'. get_string('lbl_correctaudio', 'qtype_lcspeech') .'</div><div>' . $this->getCorretionAudios($this->urls) . '</div>';
         }
 
 
@@ -956,7 +960,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
         if (!empty($this->range)) {
             $output .= '<div class="mt-5" id="accordion"><div class="card"><div class="card-header" id="headingThree"><h5 class="mb-0"><button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                              Feedback
+                                              '. get_string('lbl_feedback', 'qtype_lcspeech') .'
                                             </button>
                                           </h5>
                                         </div>
