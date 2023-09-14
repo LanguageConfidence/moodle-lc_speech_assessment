@@ -26,7 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/question/type/lcspeech/lib.php');
 
-
 /**
  * A Speech Assessment question that is being attempted.
  *
@@ -250,14 +249,25 @@ class qtype_lcspeech_question extends question_graded_automatically {
         }
 
         $postdata = json_encode($payload);
-        $ch = curl_init($endpoint);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-        $resultraw = curl_exec($ch);
-        curl_close($ch);
+        // $ch = curl_init($endpoint);
+        // curl_setopt($ch, CURLOPT_POST, 1);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, $postdata);
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        // curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        // curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+        // $resultraw = curl_exec($ch);
+        // curl_close($ch);
+        $options = array(
+            'RETURNTRANSFER' => 1,
+            'HEADER' => 0,
+            'FAILONERROR' => 1,
+            'FOLLOWLOCATION' => 1
+        );
+
+        $curl = new \curl();
+        $curl->setHeader($header);
+        $resultraw = $curl->post($endpoint, $postdata, $options);
+
         $result = json_decode($resultraw, true);
         if ($result == null) {
             return array(
