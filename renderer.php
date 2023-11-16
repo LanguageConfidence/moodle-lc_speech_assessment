@@ -259,13 +259,6 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                 $scorecolourclass = 'qtype_lcspeech_phoneme_label_' . $scorecolour;
                 $wordfeedback .= '<div class="qtype_lcspeech_phoneme"><div class="qtype_lcspeech_phoneme_label ' . $scorecolourclass . '">' . $phone_label . '</div><div class="qtype_lcspeech_phoneme_score">' . $phoneme['phoneme_score'] . '%</div></div>';
             }
-            if ($word['mean'] >= 60) {
-                $speechphrase .= $word['label'] . ' ';
-            } else if ($word['mean'] >= 30) {
-                $speechphrase .= '<u style="color:orange">' . $word['label'] . '</u>  ';
-            } else {
-                $speechphrase .= '<u style="color:red">' . $word['label'] . '</u>  ';
-            }
 
             $feedback .= '<div class="qtype_lcspeech_word"><div class="qtype_lcspeech_word_label">' . $word['label'] . '</div><div class="qtype_lcspeech_phonemes">' . $wordfeedback . '</div></div>';
         }
@@ -282,6 +275,23 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         $fs = get_file_storage();
         $componentname = $question->qtype->plugin_name();
 
+        // Add correct audio URL to the $urls array if exist
+        if (isset($question->correctionAudios) && !empty($question->correctionAudios)) {
+            foreach ($question->correctionAudios as $corr ) {
+                $draftfiles = $fs->get_area_files($question->contextid, $componentname,'correction_audio', $corr->unique_item_id, 'id', false);
+                if ($draftfiles) {
+                    foreach ($draftfiles as $file) {
+                        if ($file->is_directory()) {
+                            continue;
+                        }
+                        $url = moodle_url::make_pluginfile_url($question->contextid, $componentname,'correction_audio', "$qubaid/$slot/{$corr->unique_item_id}", '/',  $file->get_filename());
+
+                        array_push($this->urls, $url->out());
+                    }
+                }
+            }
+        }
+
         $question = $qa->get_question();
         $response = $qa->get_last_qt_data();
         if (!empty($response) && $question->is_complete_response($response)) {
@@ -295,9 +305,21 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
                 $feedbackpronuncation = $this->build_pronunciation_feedback($result['words']);
 
-                $allfeedback .= '<div><div class="qtype_lcspeech_average_score">' . get_string('lbl_overallscore', 'qtype_lcspeech') . ': ' . $result['overall_score'] . '</div><div class="qtype_lcspeech_file">' . $speechphrase . '</div>';
+                // Add feedback range if exist
+                if (isset($question->feedbackRange) && !empty($question->feedbackRange)) {
+                    foreach ($question->feedbackRange as $r) {
+                        if ($this->nBetween($result['overall_score'], (int)$r->to_range, (int)$r->from_range)) {
+                            $this->range = $r->feedback;
+                        }
 
-                $allfeedback .= '</div>';
+                        if ((int)$r->to_range === $result['overall_score'] || (int)$r->from_range === $result['overall_score']) {
+                            $this->range = $r->feedback;
+                        }
+                    }
+                }
+
+                $allfeedback .= '<div><div class="qtype_lcspeech_average_score">' . get_string('lbl_overallscore', 'qtype_lcspeech') . ': ' . $result['overall_score'] . '</div></div>';
+
                 $allfeedback .= $this->render_tabs($question);
                 $allfeedback .= '<div class="tab-content" id="myTabContent">';
 
@@ -605,7 +627,9 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         ';
 
         $enablemetadata = get_config('qtype_lcspeech', 'enablelcbetafeatures');
-        if ($enablemetadata)
+        $showContentRelevance = $enablemetadata && $question->speechtype != 'pronunciation';
+
+        if ($showContentRelevance)
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabMetaFeedback-' . $question->id . '">
                     <button class="nav-link active" data-toggle="tab" data-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
@@ -616,7 +640,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
         $tabs .= '
             <li class="nav-item" role="presentation" id="tabPro2Feedback-' . $question->id . '">
-                <button class="nav-link' . ($enablemetadata ? '' : ' active') . '" data-toggle="tab" data-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($enablemetadata ? '"false"' : '"true"') . '>
+                <button class="nav-link' . ($showContentRelevance ? '' : ' active') . '" data-toggle="tab" data-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($showContentRelevance ? '"false"' : '"true"') . '>
                     ' . get_string('lbl_pronunciation', 'qtype_lcspeech')  . '
                 </button>
             </li>
@@ -727,7 +751,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if (isset($result['grammar']['metrics']['grammatical_complexity'])) {
             $content .= '<div class="feedback-card box-border">
                     <div>
-                        <span class="bold-text">' . get_string('lbl_grammaticalcomplexity', 'qtype_lcspeech') . '<</span>
+                        <span class="bold-text">' . get_string('lbl_grammaticalcomplexity', 'qtype_lcspeech') . '</span>
                         <span class="' . $labelstyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
                     </div>
                 </div>
@@ -934,7 +958,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         }
 
         if (!empty($this->urls)) {
-            $output .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_average_score">'. get_string('lbl_correctaudio', 'qtype_lcspeech') .'</div><div>' . $this->getCorretionAudios($this->urls) . '</div>';
+            $output .= '<div class="qtype_lcspeech_file"><div class="qtype_lcspeech_correct_audio">'. get_string('lbl_correctaudio', 'qtype_lcspeech') .'</div>' . $this->getCorretionAudios($this->urls) . '</div>';
         }
 
 
