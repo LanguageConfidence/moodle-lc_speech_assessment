@@ -69,6 +69,12 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     color: black;
 }
 
+.que.lcspeech .qtype_lcspeech_correct_audio {
+    color: #212529;
+    margin-bottom: 19px;
+    font-weight: bold;
+}
+
 .que.lcspeech .qtype_lcspeech_average_score {
     color: #212529;
     margin: 19px 0 19px 0;
@@ -195,7 +201,9 @@ body#page-question-type-lcspeech.path-question-type .form-group[data-groupname=t
     align-items: center;
 }
 
-.que.lcspeech .cbtn:before {
+.que.lcspeech .cbtn:after {
+    position: absolute !important;
+    right: 10px !important;
     content: '' !important;
     display: block !important;
     width: 10px !important;
