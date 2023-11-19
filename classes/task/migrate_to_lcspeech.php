@@ -100,6 +100,9 @@ class migrate_to_lcspeech extends scheduled_task {
 
             // Insert mdl_qtype_lcspeech_options.
             $this->insert_lcspeech_feedback_speechassessment($q->id);
+
+            // Insert mdl_qtype_lcspeech_audios.
+            $this->insert_lcspeech_audios($q->id);
         }
     }
 
@@ -117,7 +120,37 @@ class migrate_to_lcspeech extends scheduled_task {
 
             // Insert mdl_qtype_lcspeech_options.
             $this->insert_lcspeech_feedback_languageconfidence($q->id);
+
+            // Insert mdl_qtype_lcspeech_audios.
+            $this->insert_lcspeech_audios($q->id);
         }
+    }
+
+    private function insert_lcspeech_audios($questionid) {
+        global $DB, $CFG;
+        // Delete mdl_qtype_lcspeech_options by question id.
+        $DB->delete_records('qtype_lcspeech_audios', array('questionid' => $questionid));
+
+        // Get mdl_qtype_langconfid_audios
+        $dbrecord = $DB->get_record_sql(
+            "
+                SELECT *
+                FROM {qtype_langconfid_audios}
+                WHERE questionid = :id
+                LIMIT 1
+            ",
+            array(
+                'id' => $questionid,
+            )
+        );
+
+        // Build record and save.
+        $opt = new \stdClass();
+        $opt->questionid = $questionid;
+        $opt->language = $dbrecord->language;
+        $opt->audio_file = $dbrecord->audio_file;
+        $opt->unique_item_id = $dbrecord->unique_item_id;
+        $DB->insert_record('qtype_lcspeech_audios', $opt);
     }
 
     private function insert_lcspeech_feedback_languageconfidence($questionid) {
