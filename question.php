@@ -239,7 +239,7 @@ class qtype_lcspeech_question extends question_graded_automatically {
         // var_dump($endpoint);
         $header = array(
             'Content-Type: application/json',
-            'x-blobr-key: ' . $apikey,
+            'api-key: ' . $apikey,
             'x-user-id:' . $this->get_current_hostname() . '-' . $USER->id,
             'lc-custom-moodle-instance-hostname:' . $this->get_current_hostname()
         );
