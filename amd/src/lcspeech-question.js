@@ -193,22 +193,54 @@ define(['core/log', 'core/modal_factory', 'qtype_lcspeech/recorder'], function(L
             Log.debug('Audio question: recording stopped.');
             Log.debug('Created blob', blob);
             mediaElement.srcObject = null;
-            mediaElement.src = URL.createObjectURL(blob);
+            var objectUrl = URL.createObjectURL(blob);
+            mediaElement.src = objectUrl;
 
-            // Show audio player with controls enabled, and unmute.
-            mediaElement.muted = false;
-            mediaElement.controls = true;
-            mediaElement.parentElement.classList.remove('hide');
-            noMediaPlaceholder.classList.add('hide');
-            mediaElement.focus();
+            // Wait for metadata to determine duration before proceeding.
+            mediaElement.onloadedmetadata = function() {
+                var durationSeconds = mediaElement.duration;
 
-            // Encure the button while things change.
-            button.disabled = true;
-            button.classList.remove('btn-danger');
-            button.classList.add('btn-outline-warning');
-            button.dataset.state = 'recorded';
+                if (!isNaN(durationSeconds) && durationSeconds <= 1) {
+                    // Too short: show message, reset to new state, do not upload, disable submit.
+                    setPlaceholderMessage('recordingtooshort');
+                    setButtonLabel('startrecording');
+                    button.classList.remove('btn-danger');
+                    button.classList.add('btn-outline-warning');
+                    button.dataset.state = 'new';
+                    button.disabled = false;
 
-            owner.notifyRecordingComplete(recorder);
+                    try {
+                        owner.showAlert('recordingtooshort');
+                    } catch (e) {
+                        // Ignore if modal cannot be shown.
+                    }
+
+                    // Hide the media element and clean up.
+                    mediaElement.pause();
+                    mediaElement.removeAttribute('src');
+                    mediaElement.load();
+                    URL.revokeObjectURL(objectUrl);
+
+                    // Re-enable other buttons and update submit state.
+                    enableAllButtons();
+                    return;
+                }
+
+                // Show audio player with controls enabled, and unmute.
+                mediaElement.muted = false;
+                mediaElement.controls = true;
+                mediaElement.parentElement.classList.remove('hide');
+                noMediaPlaceholder.classList.add('hide');
+                mediaElement.focus();
+
+                // Ensure the button while things change.
+                button.disabled = true;
+                button.classList.remove('btn-danger');
+                button.classList.add('btn-outline-warning');
+                button.dataset.state = 'recorded';
+
+                owner.notifyRecordingComplete(recorder);
+            };
         }
 
         /**
