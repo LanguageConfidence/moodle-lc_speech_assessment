@@ -444,7 +444,9 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                 $allfeedback .= $speakingscore;
                 $allfeedback .= '</div>';
 
-                $showgrammar = isset($result['grammar']['metrics']['mistake_count']) || isset($result['grammar']['metrics']['grammatical_complexity']);
+                $showgrammar = isset($result['grammar']['metrics']['mistake_count'])
+                    || isset($result['grammar']['metrics']['grammatical_complexity'])
+                    || (isset($result['grammar']['feedback']) && is_array($result['grammar']['feedback']));
                 $allfeedback .= $this->render_tabs($question, $showgrammar);
                 $allfeedback .= '<div class="tab-content" id="myTabContent">';
 
@@ -632,7 +634,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if ($showContentRelevance)
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabMetaFeedback-' . $question->id . '">
-                    <button class="nav-link active" data-toggle="tab" data-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
                         ' . get_string('lbl_contentrelevance', 'qtype_lcspeech')  . '
                     </button>
                 </li>
@@ -640,7 +642,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
         $tabs .= '
             <li class="nav-item" role="presentation" id="tabPro2Feedback-' . $question->id . '">
-                <button class="nav-link' . ($showContentRelevance ? '' : ' active') . '" data-toggle="tab" data-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($showContentRelevance ? '"false"' : '"true"') . '>
+                <button class="nav-link' . ($showContentRelevance ? '' : ' active') . '" data-bs-toggle="tab" data-bs-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($showContentRelevance ? '"false"' : '"true"') . '>
                     ' . get_string('lbl_pronunciation', 'qtype_lcspeech')  . '
                 </button>
             </li>
@@ -649,7 +651,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if ($question->speechtype != 'pronunciation') {
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabFluency-' . $question->id . '">
-                    <button class="nav-link" data-toggle="tab" data-target="#collapseFluency' . $question->id . '" type="button" role="tab" aria-controls="collapseFluency' . $question->id . '" aria-selected="false">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#collapseFluency' . $question->id . '" type="button" role="tab" aria-controls="collapseFluency' . $question->id . '" aria-selected="false">
                         ' . get_string('lbl_fluencyfeedback', 'qtype_lcspeech')  . '
                     </button>
                 </li>
@@ -660,7 +662,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             if ($showgrammar) {
                 $tabs .= '
                     <li class="nav-item" role="presentation" id="tabGrammar-' . $question->id . '">
-                        <button class="nav-link" data-toggle="tab" data-target="#collapseGrammar' . $question->id . '" type="button" role="tab" aria-controls="collapseGrammar' . $question->id . '" aria-selected="false">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#collapseGrammar' . $question->id . '" type="button" role="tab" aria-controls="collapseGrammar' . $question->id . '" aria-selected="false">
                             ' . get_string('lbl_grammarfeedback', 'qtype_lcspeech')  . '
                         </button>
                     </li>
@@ -668,7 +670,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             }
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabVocabulary-' . $question->id . '">
-                    <button class="nav-link" data-toggle="tab" data-target="#collapseVocabulary' . $question->id . '" type="button" role="tab" aria-controls="collapseVocabulary' . $question->id . '" aria-selected="false">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#collapseVocabulary' . $question->id . '" type="button" role="tab" aria-controls="collapseVocabulary' . $question->id . '" aria-selected="false">
                         ' . get_string('lbl_vocabularyfeedback', 'qtype_lcspeech')  . '
                     </button>
                 </li>
@@ -736,58 +738,125 @@ class qtype_lcspeech_renderer extends qtype_renderer {
     }
 
     protected function render_grammar($result, $question) {
-        $labelstyle = 'comlexity_label_' . $result['grammar']['metrics']['grammatical_complexity'];
+        $grammar = $result['grammar'];
+
+        $hasnewstructure = isset($grammar['feedback']) && is_array($grammar['feedback']);
+
         $content = '';
-        if (isset($result['grammar']['metrics']['mistake_count'])) {
-            $content .= '<div class="feedback-card box-border">
-                    <div>
-                        <span class="bold-text">' . get_string('lbl_grammarmistakeccount', 'qtype_lcspeech') . '</span>
-                        <span>' . $result['grammar']['metrics']['mistake_count'] . '</span>
+
+        if ($hasnewstructure) {
+            $mistake_count = $grammar['feedback']['mistake_count']
+                         ?? $grammar['metrics']['mistake_count']
+                         ?? 0;
+
+            $complexity = $grammar['feedback']['response_complexity']
+                      ?? $grammar['metrics']['grammatical_complexity']
+                      ?? 'SIMPLE';
+
+            $labelstyle = 'comlexity_label_' . strtoupper($complexity);
+
+            $content .= '
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="feedback-card box-border h-100">
+                            <span class="' . $labelstyle . ' mb-2 d-inline-block">' . ucwords(strtolower(str_replace('_', ' ', $complexity))) . '</span>
+                            <div class="bold-text">' . get_string('lbl_grammaticalcomplexity', 'qtype_lcspeech') . '</div>
+                        </div>
                     </div>
-                </div>
-                ';
-        }
-
-        if (isset($result['grammar']['metrics']['grammatical_complexity'])) {
-            $content .= '<div class="feedback-card box-border">
-                    <div>
-                        <span class="bold-text">' . get_string('lbl_grammaticalcomplexity', 'qtype_lcspeech') . '</span>
-                        <span class="' . $labelstyle . '">' . ucwords(strtolower($result['grammar']['metrics']['grammatical_complexity'])) . '</span>
+                    <div class="col-md-6">
+                        <div class="feedback-card box-border h-100">
+                            <h4 class="mb-0 ' . ($mistake_count > 0 ? 'text-danger' : 'text-success') . '">' . $mistake_count . '</h4>
+                            <div class="bold-text">' . get_string('lbl_grammarmistakeccount', 'qtype_lcspeech') . '</div>
+                        </div>
                     </div>
-                </div>
-                ';
+                </div>';
+
+            if (!empty($grammar['feedback']['grammar_feedback'])) {
+                $content .= '
+                    <div class="feedback-card box-border mt-3">
+                        <div class="bold-text">' . get_string('lbl_feedback', 'qtype_lcspeech') . '</div>
+                        <div class="mt-2 text-muted">' . $grammar['feedback']['grammar_feedback'] . '</div>
+                    </div>';
+            }
+
+            if (!empty($grammar['feedback']['suggested_answer'])) {
+                $content .= '
+                    <div class="feedback-card box-border mt-3">
+                        <div class="bold-text">' . get_string('lbl_suggestedanswer', 'qtype_lcspeech') . '</div>
+                        <div class="mt-2 text-muted">' . $grammar['feedback']['suggested_answer'] . '</div>
+                    </div>';
+            }
+        } else {
+            $mistake_count = $grammar['metrics']['mistake_count'] ?? 0;
+            $complexity = $grammar['metrics']['grammatical_complexity'] ?? 'SIMPLE';
+            $labelstyle = 'comlexity_label_' . strtoupper($complexity);
+
+            $content .= '
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="feedback-card box-border h-100">
+                            <span class="' . $labelstyle . ' mb-2 d-inline-block">' . ucwords(strtolower(str_replace('_', ' ', $complexity))) . '</span>
+                            <div class="bold-text">' . get_string('lbl_grammaticalcomplexity', 'qtype_lcspeech') . '</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="feedback-card box-border h-100">
+                            <h4 class="mb-0 ' . ($mistake_count > 0 ? 'text-danger' : 'text-success') . '">' . $mistake_count . '</h4>
+                            <div class="bold-text">' . get_string('lbl_grammarmistakeccount', 'qtype_lcspeech') . '</div>
+                        </div>
+                    </div>
+                </div>';
         }
 
-        $grammar = '';
+        if (empty($content)) return '';
 
-        if (!empty($content)) {
-            $grammar .= '              
-                <div id="collapseGrammar' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabGrammar-' . $question->id . '">
-                    <div class="qtype_lcspeech_words">' . $content . '</div>
-                </div>
-            ';
-        }
-        return $grammar;
+        return '
+            <div id="collapseGrammar' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabGrammar-' . $question->id . '">
+                <div class="qtype_lcspeech_words">' . $content . '</div>
+            </div>';
     }
 
     protected function render_vocabulary($result, $question) {
-        $labelstyle = 'comlexity_label_' . $result['vocabulary']['metrics']['vocabulary_complexity'];
+        $vocab = $result['vocabulary'];
+        $hasnewstructure = isset($vocab['feedback']['vocabulary_usage_quality']);
+
+        $complexity = $vocab['metrics']['vocabulary_complexity'] ?? 'SIMPLE';
+        $labelstyle = 'comlexity_label_' . strtoupper($complexity);
 
         $content = '';
-        $content .= '<div class="feedback-card box-border">
-                <div>
-                    <span class="bold-text">' . get_string('lbl_vocabularycomplexity', 'qtype_lcspeech') . '</span>
-                    <span class="' . $labelstyle . '">' . ucwords(strtolower($result['vocabulary']['metrics']['vocabulary_complexity'])) . '</span>
+        $content .= '
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="feedback-card box-border h-100">
+                    <span class="' . $labelstyle . ' mb-2 d-inline-block">' . ucwords(strtolower($complexity)) . '</span>
+                    <div class="bold-text">' . get_string('lbl_vocabularycomplexity', 'qtype_lcspeech') . '</div>
                 </div>
-            </div>
-            ';
+            </div>';
 
-        $grammar = '';
-        $grammar .= '<div id="collapseVocabulary' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabVocabulary-' . $question->id . '">
+        $content .= '</div>';
+
+        if ($hasnewstructure) {
+            if (!empty($vocab['feedback']['feedback'])) {
+                $content .= '
+                    <div class="feedback-card box-border mt-3">
+                        <div class="bold-text">' . get_string('lbl_feedback', 'qtype_lcspeech') . '</div>
+                        <div class="mt-2 text-muted">' . $vocab['feedback']['feedback'] . '</div>
+                    </div>';
+            }
+
+            if (!empty($vocab['feedback']['suggested_improvements'])) {
+                $content .= '
+                    <div class="feedback-card box-border mt-3">
+                        <div class="bold-text">' . get_string('lbl_suggested_improvements', 'qtype_lcspeech') . '</div>
+                        <div class="mt-2 text-muted">' . $vocab['feedback']['suggested_improvements'] . '</div>
+                    </div>';
+            }
+        }
+
+        return '
+            <div id="collapseVocabulary' . $question->id . '" class="tab-pane fade" role="tabpanel" aria-labelledby="tabVocabulary-' . $question->id . '">
                 <div class="qtype_lcspeech_words">' . $content . '</div>
-            </div>
-        ';
-        return $grammar;
+            </div>';
     }
 
     protected function render_speaking_score_scripted($result, $question) {
@@ -946,14 +1015,14 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                                       <div class="card">
                                         <div class="card-header" id="headingTwo">
                                           <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            <button type="button" class="btn btn-link cbtn" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                                               '. get_string('lbl_sampleanswer', 'qtype_lcspeech') .'
                                             </button>
                                             <span><p class="note">'. get_string('lbl_sampleanswer_desc', 'qtype_lcspeech') .'</p></span>
                                           </h5>
                                         </div>
 
-                                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo">
                                           <div class="card-body">';
         }
 
@@ -983,13 +1052,13 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         }
 
         if (!empty($this->range)) {
-            $output .= '<div class="mt-5" id="accordion"><div class="card"><div class="card-header" id="headingThree"><h5 class="mb-0"><button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            $output .= '<div class="mt-5" id="accordion"><div class="card"><div class="card-header" id="headingThree"><h5 class="mb-0"><button type="button" class="btn btn-link cbtn" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                                               '. get_string('lbl_feedback', 'qtype_lcspeech') .'
                                             </button>
                                           </h5>
                                         </div>
 
-                                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree">
                                           <div class="card-body"><div class="qtype_lcspeech_file"><p>' . $this->range . '</p></div></div></div></div></div>';
         }
         $output .= '</div>';

@@ -159,3 +159,6 @@ $string['lbl_sampleanswer'] = 'Sample Answer';
 $string['lbl_sampleanswer_desc'] = 'Note: You should try your best before clicking here';
 $string['lbl_correctaudio'] = 'Correct Audio';
 $string['lbl_feedback'] = 'Feedback';
+$string['lbl_suggestedanswer'] = 'Suggested Answer';
+$string['lbl_suggested_improvements'] = 'Suggested Improvements';
+$string['lbl_usage_quality'] = 'Usage Quality';
