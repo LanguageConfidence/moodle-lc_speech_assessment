@@ -634,7 +634,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if ($showContentRelevance)
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabMetaFeedback-' . $question->id . '">
-                    <button class="nav-link active" data-toggle="tab" data-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#collapseMetaFeedback-' . $question->id . '" type="button" role="tab" aria-controls="collapseProFeedback-' . $question->id . '" aria-selected="true">
                         ' . get_string('lbl_contentrelevance', 'qtype_lcspeech')  . '
                     </button>
                 </li>
@@ -642,7 +642,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
         $tabs .= '
             <li class="nav-item" role="presentation" id="tabPro2Feedback-' . $question->id . '">
-                <button class="nav-link' . ($showContentRelevance ? '' : ' active') . '" data-toggle="tab" data-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($showContentRelevance ? '"false"' : '"true"') . '>
+                <button class="nav-link' . ($showContentRelevance ? '' : ' active') . '" data-bs-toggle="tab" data-bs-target="#collapsePro2Feedback-' . $question->id . '" type="button" role="tab" aria-controls="collapsePro2Feedback-' . $question->id . '" aria-selected=' . ($showContentRelevance ? '"false"' : '"true"') . '>
                     ' . get_string('lbl_pronunciation', 'qtype_lcspeech')  . '
                 </button>
             </li>
@@ -651,7 +651,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         if ($question->speechtype != 'pronunciation') {
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabFluency-' . $question->id . '">
-                    <button class="nav-link" data-toggle="tab" data-target="#collapseFluency' . $question->id . '" type="button" role="tab" aria-controls="collapseFluency' . $question->id . '" aria-selected="false">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#collapseFluency' . $question->id . '" type="button" role="tab" aria-controls="collapseFluency' . $question->id . '" aria-selected="false">
                         ' . get_string('lbl_fluencyfeedback', 'qtype_lcspeech')  . '
                     </button>
                 </li>
@@ -662,7 +662,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             if ($showgrammar) {
                 $tabs .= '
                     <li class="nav-item" role="presentation" id="tabGrammar-' . $question->id . '">
-                        <button class="nav-link" data-toggle="tab" data-target="#collapseGrammar' . $question->id . '" type="button" role="tab" aria-controls="collapseGrammar' . $question->id . '" aria-selected="false">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#collapseGrammar' . $question->id . '" type="button" role="tab" aria-controls="collapseGrammar' . $question->id . '" aria-selected="false">
                             ' . get_string('lbl_grammarfeedback', 'qtype_lcspeech')  . '
                         </button>
                     </li>
@@ -670,7 +670,7 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             }
             $tabs .= '
                 <li class="nav-item" role="presentation" id="tabVocabulary-' . $question->id . '">
-                    <button class="nav-link" data-toggle="tab" data-target="#collapseVocabulary' . $question->id . '" type="button" role="tab" aria-controls="collapseVocabulary' . $question->id . '" aria-selected="false">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#collapseVocabulary' . $question->id . '" type="button" role="tab" aria-controls="collapseVocabulary' . $question->id . '" aria-selected="false">
                         ' . get_string('lbl_vocabularyfeedback', 'qtype_lcspeech')  . '
                     </button>
                 </li>
@@ -781,9 +781,9 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
             if (!empty($grammar['feedback']['suggested_answer'])) {
                 $content .= '
-                    <div class="feedback-card box-border mt-3" style="border-left: 4px solid #007bff; background-color: #f0f7ff;">
-                        <div class="bold-text text-primary">' . get_string('lbl_suggestedanswer', 'qtype_lcspeech') . '</div>
-                        <div class="mt-2"><strong>' . $grammar['feedback']['suggested_answer'] . '</strong></div>
+                    <div class="feedback-card box-border mt-3">
+                        <div class="bold-text">' . get_string('lbl_suggestedanswer', 'qtype_lcspeech') . '</div>
+                        <div class="mt-2 text-muted">' . $grammar['feedback']['suggested_answer'] . '</div>
                     </div>';
             }
         } else {
@@ -833,19 +833,6 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                 </div>
             </div>';
 
-        if ($hasnewstructure) {
-            $quality = $vocab['feedback']['vocabulary_usage_quality'] ?? '';
-            if ($quality) {
-                $content .= '
-                    <div class="col-md-6">
-                        <div class="feedback-card box-border h-100">
-                            <span class="badge badge-info mb-2">' . strtoupper($quality) . '</span>
-                            <div class="bold-text">' . get_string('lbl_usage_quality', 'qtype_lcspeech') . '</div>
-                        </div>
-                    </div>';
-            }
-        }
-
         $content .= '</div>';
 
         if ($hasnewstructure) {
@@ -859,9 +846,9 @@ class qtype_lcspeech_renderer extends qtype_renderer {
 
             if (!empty($vocab['feedback']['suggested_improvements'])) {
                 $content .= '
-                    <div class="feedback-card box-border mt-3" style="border-left: 4px solid #28a745; background-color: #f4faf6;">
-                        <div class="bold-text text-success">' . get_string('lbl_suggested_improvements', 'qtype_lcspeech') . '</div>
-                        <div class="mt-2">' . $vocab['feedback']['suggested_improvements'] . '</div>
+                    <div class="feedback-card box-border mt-3">
+                        <div class="bold-text">' . get_string('lbl_suggested_improvements', 'qtype_lcspeech') . '</div>
+                        <div class="mt-2 text-muted">' . $vocab['feedback']['suggested_improvements'] . '</div>
                     </div>';
             }
         }
@@ -1028,14 +1015,14 @@ class qtype_lcspeech_renderer extends qtype_renderer {
                                       <div class="card">
                                         <div class="card-header" id="headingTwo">
                                           <h5 class="mb-0">
-                                            <button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                            <button type="button" class="btn btn-link cbtn" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                                               '. get_string('lbl_sampleanswer', 'qtype_lcspeech') .'
                                             </button>
                                             <span><p class="note">'. get_string('lbl_sampleanswer_desc', 'qtype_lcspeech') .'</p></span>
                                           </h5>
                                         </div>
 
-                                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo">
                                           <div class="card-body">';
         }
 
@@ -1065,13 +1052,13 @@ class qtype_lcspeech_renderer extends qtype_renderer {
         }
 
         if (!empty($this->range)) {
-            $output .= '<div class="mt-5" id="accordion"><div class="card"><div class="card-header" id="headingThree"><h5 class="mb-0"><button type="button" class="btn btn-link cbtn" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+            $output .= '<div class="mt-5" id="accordion"><div class="card"><div class="card-header" id="headingThree"><h5 class="mb-0"><button type="button" class="btn btn-link cbtn" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                                               '. get_string('lbl_feedback', 'qtype_lcspeech') .'
                                             </button>
                                           </h5>
                                         </div>
 
-                                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree">
                                           <div class="card-body"><div class="qtype_lcspeech_file"><p>' . $this->range . '</p></div></div></div></div></div>';
         }
         $output .= '</div>';
