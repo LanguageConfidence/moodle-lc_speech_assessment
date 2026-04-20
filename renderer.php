@@ -1101,6 +1101,8 @@ class qtype_lcspeech_renderer extends qtype_renderer {
             'uploadfailed404',
             'uploadpreparing',
             'uploadprogress',
+            'recordingtooshort',
+            'recordingtooshort_title',
         ];
     }
 
